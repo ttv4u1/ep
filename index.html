@@ -390,7 +390,7 @@ async function saveToBaserow() {
             // Juga simpan ke Firebase sebagai backup jika mahu
             await saveToFirebase(dataBaserow); 
             
-            alert("Rekod Berjaya Disimpan ke dan dihantar ke HQ. Terima Kasih Anggota!");
+            alert("Rekod Berjaya Disimpan dan dihantar ke HQ. Terima Kasih Anggota!");
             resetForm();
         } else {
             const errorData = await response.json();
