@@ -3,449 +3,645 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>e-Penguatkuasa v1.3.0 | BPK Dashboard</title>
+    <title>e-Penguatkuasa v1.9.0 | BPK Dashboard</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <style>
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
-            background-color: #f0f4f8;
-            /* Wallpaper Infografik Jata Negara */
-            background-image: linear-gradient(rgba(240, 244, 248, 0.94), rgba(240, 244, 248, 0.94)), 
+            background-color: #f8fafc;
+            background-image: linear-gradient(rgba(248, 250, 252, 0.97), rgba(248, 250, 252, 0.97)), 
                               url('https://www.akm.gov.my/images/madani/JATA%20NEGARA%20AI-01.png');
             background-attachment: fixed;
             background-position: center;
             background-repeat: no-repeat;
-            background-size: 700px;
-        }
-
-        .realistic-icon {
-            filter: drop-shadow(2px 4px 6px rgba(0,0,0,0.1));
-            font-size: 2.5rem;
-            transition: transform 0.3s ease;
-        }
-
-        .realistic-icon:hover {
-            transform: scale(1.2) rotate(5deg);
+            background-size: 600px;
         }
 
         .card-glass {
-            background: rgba(255, 255, 255, 0.85);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.6);
-            border-radius: 30px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+            background: rgba(255, 255, 255, 0.92);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            border-radius: 24px;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
         }
 
-        /* Profile Sidebar Logic */
         #profileSidebar {
             transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
             right: -400px;
         }
-        #profileSidebar.active {
-            right: 0;
-        }
+        #profileSidebar.active { right: 0; }
 
         .form-input-modern {
             width: 100%;
-            padding: 12px 16px;
-            border-radius: 12px;
-            border: 1.5px solid #d1d5db;
+            padding: 8px 12px;
+            border-radius: 10px;
+            border: 1.5px solid #e2e8f0;
             background: #ffffff;
             font-weight: 600;
-            color: #1f2937;
-            transition: 0.2s;
+            font-size: 0.75rem;
+            transition: all 0.2s;
         }
 
-        .form-input-modern:focus {
-            border-color: #3b82f6;
-            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
-            outline: none;
-        }
+        .form-input-modern:focus { border-color: #3b82f6; outline: none; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1); }
 
         .section-header {
             display: flex;
             align-items: center;
             gap: 12px;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
             padding-bottom: 10px;
-            border-bottom: 2px solid #e5e7eb;
+            border-bottom: 2px solid #f1f5f9;
+        }
+
+        .animal-card {
+            background: #ffffff;
+            border: 1px solid #f1f5f9;
+            border-radius: 18px;
+            padding: 10px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+        .animal-card:hover { transform: translateY(-5px); box-shadow: 0 10px 15px -3px rgba(0,0,0,0.05); }
+
+        #map { height: 200px; border-radius: 16px; margin-top: 10px; border: 2px solid #f1f5f9; z-index: 10; }
+
+        .logo-img {
+            height: 44px;
+            width: auto;
+            object-fit: contain;
         }
 
         @media print {
+            @page { size: A4; margin: 0.5cm; }
             .no-print { display: none !important; }
-            .card-glass { box-shadow: none; border: 1px solid #000; background: white; }
-            body { background: white !important; }
+            .card-glass { border: 1px solid #e2e8f0 !important; box-shadow: none !important; margin-bottom: 5px !important; padding: 10px !important; }
+            .grid { display: grid !important; grid-template-columns: repeat(4, 1fr) !important; gap: 5px !important; }
         }
     </style>
 </head>
 <body class="p-0 m-0">
 
-    <!-- TOP NAVIGATION BAR -->
-    <header class="sticky top-0 z-40 bg-white/90 backdrop-blur-md border-b border-gray-200 no-print">
-        <div class="max-w-screen-2xl mx-auto px-6 py-3 flex justify-between items-center">
-            <!-- Logos & Versi -->
-            <div class="flex items-center gap-6">
-                <div class="flex items-center gap-3">
-                    <img src="https://www.akm.gov.my/images/madani/JATA%20NEGARA%20AI-01.png" class="w-12" alt="Jata">
-                    <div class="hidden sm:block">
-                        <p class="text-xs font-black text-slate-800 leading-none">JABATAN PERKHIDMATAN VETERINAR</p>
-                        <p class="text-[10px] font-bold text-blue-600">BAHAGIAN PENGUATKUASA (BPK)</p>
-                    </div>
+    <!-- TOP NAVIGATION -->
+    <header class="sticky top-0 z-40 bg-white/80 backdrop-blur-md border-b border-gray-100 no-print">
+        <div class="max-w-screen-2xl mx-auto px-6 py-2 flex justify-between items-center">
+            <div class="flex items-center gap-4">
+                <img src="https://www.akm.gov.my/images/madani/JATA%20NEGARA%20AI-01.png" class="logo-img" alt="Jata">
+                <img src="https://github.com/ttv4u1/KP/raw/main/DVS.svg" class="logo-img" alt="JPV">
+                <img src="https://github.com/ttv4u1/KP/raw/main/Logo%20Penguatkuasa.png" class="logo-img" alt="BPK" onerror="this.src='https://cdn-icons-png.flaticon.com/512/1022/1022330.png'">
+                
+                <div class="border-l pl-4 border-gray-200">
+                    <p class="text-[10px] font-black text-slate-800 leading-none uppercase">JPV MALAYSIA</p>
+                    <p class="text-[9px] font-bold text-blue-600 uppercase">Bahagian Penguatkuasa (BPK)</p>
                 </div>
-                <div class="bg-blue-600 text-white text-[10px] px-3 py-1 rounded-full font-bold">VERSI 1.3.0</div>
+                <div class="bg-blue-600 text-white text-[8px] px-2 py-0.5 rounded-full font-bold ml-2">v1.8.0</div>
             </div>
 
-            <!-- Real-time Clock -->
-            <div class="hidden lg:flex flex-col items-center">
-                <div id="clock" class="text-xl font-black text-slate-800 tabular-nums">00:00:00 AM</div>
-                <div id="current-date" class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Memuatkan...</div>
-            </div>
-
-            <!-- Profile & Print -->
             <div class="flex items-center gap-3">
-                <button onclick="window.print()" class="p-3 rounded-xl bg-slate-100 hover:bg-slate-200 transition">
-                    <i data-lucide="printer" class="w-5 h-5 text-slate-600"></i>
-                </button>
-                <button onclick="toggleProfile()" class="flex items-center gap-3 bg-slate-900 text-white p-1 pr-4 rounded-xl hover:bg-slate-800 transition shadow-lg">
-                    <div class="w-10 h-10 rounded-lg bg-blue-500 flex items-center justify-center font-bold">AF</div>
+                <div class="hidden lg:block text-right mr-4">
+                    <div id="clock" class="text-sm font-black text-slate-800 leading-none">00:00:00 AM</div>
+                    <div id="current-date" class="text-[8px] font-bold text-slate-400 uppercase tracking-widest">...</div>
+                </div>
+                <button onclick="window.print()" class="p-2.5 rounded-xl bg-slate-50 hover:bg-slate-100 text-slate-600 transition"><i data-lucide="printer" class="w-4 h-4"></i></button>
+                <button onclick="toggleProfile()" class="flex items-center gap-2 bg-slate-900 text-white p-1 pr-3 rounded-xl hover:bg-slate-800 transition shadow-lg">
+                    <img id="navAvatar" src="https://api.dicebear.com/7.x/avataaars/svg?seed=Ahmad" class="w-8 h-8 rounded-lg bg-white object-cover">
                     <div class="text-left">
-                        <p class="text-[10px] font-bold opacity-70 leading-none">LOG MASUK</p>
-                        <p class="text-[11px] font-black uppercase">Ahmad Firdaus</p>
+                        <p class="text-[9px] font-black uppercase leading-none" id="navName">Ahmad Firdaus</p>
+                        <p class="text-[7px] font-bold text-blue-400 uppercase" id="navGred">KP22</p>
                     </div>
                 </button>
             </div>
         </div>
     </header>
 
-    <!-- FULL PROFILE SIDEBAR (AUTOHIDE) -->
-    <aside id="profileSidebar" class="fixed top-0 h-full w-80 bg-white shadow-2xl z-50 p-8 no-print">
-        <div class="flex justify-between items-center mb-10">
-            <h2 class="font-black text-slate-800">PROFIL PEGAWAI</h2>
+    <!-- PROFILE SIDEBAR -->
+    <aside id="profileSidebar" class="fixed top-0 h-full w-80 bg-white shadow-2xl z-50 p-8 no-print overflow-y-auto">
+        <div class="flex justify-between items-center mb-8">
+            <h2 class="font-black text-slate-800 uppercase text-xs">Pengurusan Profil</h2>
             <button onclick="toggleProfile()" class="p-2 hover:bg-slate-100 rounded-full transition"><i data-lucide="x"></i></button>
         </div>
-        
+
         <div class="flex flex-col items-center mb-8">
-            <div class="w-28 h-28 rounded-[40px] bg-gradient-to-tr from-blue-600 to-cyan-400 p-1 mb-4 shadow-xl">
-                <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Ahmad" class="w-full h-full rounded-[38px] bg-white" alt="Profile">
+            <div class="relative group cursor-pointer" onclick="document.getElementById('profileUpload').click()">
+                <div class="w-24 h-24 rounded-[30px] overflow-hidden border-4 border-blue-500 shadow-xl relative">
+                    <img id="sideAvatar" src="https://api.dicebear.com/7.x/avataaars/svg?seed=Ahmad" class="w-full h-full object-cover bg-slate-50">
+                    <div class="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                        <i data-lucide="camera" class="text-white w-6 h-6"></i>
+                    </div>
+                </div>
+                <input type="file" id="profileUpload" class="hidden" accept="image/*" onchange="previewImage(this)">
+                <p class="text-[8px] text-blue-500 font-bold mt-2 uppercase text-center">Klik gambar untuk tukar</p>
             </div>
-            <h3 class="text-lg font-black text-slate-900">AHMAD FIRDAUS BIN ALI</h3>
-            <p class="text-xs font-bold text-blue-600 uppercase">Pegawai Penguatkuasa</p>
+            <input type="text" id="userName" oninput="updateProfileDisplay()" class="mt-4 text-center font-black text-slate-900 uppercase text-sm border-b border-transparent focus:border-blue-500 outline-none w-full" value="AHMAD FIRDAUS BIN ALI">
         </div>
 
-        <div class="space-y-4">
-            <div class="bg-slate-50 p-4 rounded-2xl border border-slate-100">
-                <p class="text-[10px] font-bold text-slate-400 uppercase mb-1">Gred Jawatan</p>
-                <p class="text-sm font-bold text-slate-800">KP22 (KONTRAK/TETAP)</p>
+        <div class="space-y-4 mb-8">
+            <div>
+                <label class="text-[8px] font-black text-slate-400 uppercase">Gred Jawatan</label>
+                <input type="text" id="userGred" oninput="updateProfileDisplay()" class="form-input-modern" value="KP22 (KONTRAK)">
             </div>
-            <div class="bg-slate-50 p-4 rounded-2xl border border-slate-100">
-                <p class="text-[10px] font-bold text-slate-400 uppercase mb-1">Negeri / Cawangan</p>
-                <p class="text-sm font-bold text-slate-800">SELANGOR / SHAH ALAM</p>
+            <div>
+                <label class="text-[8px] font-black text-slate-400 uppercase">Cawangan / Negeri</label>
+                <input type="text" id="userCawangan" oninput="saveProfileInfo()" class="form-input-modern" value="SELANGOR / SHAH ALAM">
             </div>
-            <div class="bg-slate-50 p-4 rounded-2xl border border-slate-100">
-                <p class="text-[10px] font-bold text-slate-400 uppercase mb-1">ID Pengguna</p>
-                <p class="text-sm font-bold text-slate-800">JV/2024/9912-B</p>
+            <div class="pt-4 border-t">
+                <button onclick="composeEmail()" class="w-full py-3 bg-blue-600 text-white rounded-xl font-bold text-xs flex items-center justify-center gap-2 shadow-lg hover:bg-blue-700 transition">
+                    <i data-lucide="mail" class="w-4 h-4"></i> Hantar Emel Laporan
+                </button>
             </div>
         </div>
         
-        <button class="w-full mt-10 py-4 bg-red-50 text-red-600 font-bold rounded-2xl border border-red-100 hover:bg-red-100 transition">LOG KELUAR SISTEM</button>
+        <button class="w-full py-3 bg-red-50 text-red-600 text-xs font-bold rounded-xl border border-red-100">LOG KELUAR SISTEM</button>
     </aside>
 
-    <!-- MAIN DATA ENTRY -->
-    <main class="max-w-screen-2xl mx-auto p-6 md:p-10 space-y-12">
+    <main class="max-w-screen-2xl mx-auto p-4 md:p-8 space-y-6">
         
-        <form id="dataForm">
-            <!-- 1. MAKLUMAT PENTADBIRAN -->
-            <div class="card-glass p-8 mb-10">
+        <form id="mainForm">
+            <!-- Hidden ID to track if we are editing an existing record -->
+            <input type="hidden" id="current_record_id" name="id">
+
+            <!-- SECTION A: PENTADBIRAN -->
+            <div class="card-glass p-6">
                 <div class="section-header">
-                    <span class="text-3xl">📁</span>
-                    <div>
-                        <h3 class="font-black text-slate-800 uppercase text-lg leading-none">MAKLUMAT PENTADBIRAN KES</h3>
-                        <p class="text-[10px] font-bold text-slate-400 mt-1">SILA PASTIKAN NO REPOT POLIS & IP ADALAH TEPAT</p>
-                    </div>
+                    <img src="https://cdn-icons-png.flaticon.com/512/3022/3022216.png" class="w-8 h-8" alt="Icon">
+                    <h3 class="font-black text-slate-800 uppercase text-xs">A. Pentadbiran & Maklumat Kes</h3>
                 </div>
-                <div class="grid grid-cols-1 md:grid-cols-4 lg:grid-cols-6 gap-6">
-                    <div><label class="text-[10px] font-black text-slate-500 mb-2 block uppercase">Bil</label><input type="text" class="form-input-modern" placeholder="01"></div>
-                    <div><label class="text-[10px] font-black text-slate-500 mb-2 block uppercase">Tahun</label><input type="text" class="form-input-modern" value="2024"></div>
-                    <div><label class="text-[10px] font-black text-slate-500 mb-2 block uppercase">Bulan</label><select class="form-input-modern"><option>JANUARI</option><option>FEBRUARI</option><option>MAC</option></select></div>
-                    <div class="lg:col-span-2"><label class="text-[10px] font-black text-slate-500 mb-2 block uppercase">Penguatkuasa</label><input type="text" class="form-input-modern" placeholder="Nama Pegawai Bertugas"></div>
-                    <div><label class="text-[10px] font-black text-slate-500 mb-2 block uppercase">Kategori Kes</label><input type="text" class="form-input-modern" placeholder="..."></div>
+                <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3">
+                    <div><label class="text-[8px] font-black text-slate-400 uppercase">Bil</label><input type="text" name="bil" class="form-input-modern" placeholder="001/2024"></div>
+                    <div><label class="text-[8px] font-black text-slate-400 uppercase">Tahun</label><input type="text" name="tahun" class="form-input-modern" value="2024"></div>
+                    <div><label class="text-[8px] font-black text-slate-400 uppercase">Bulan</label>
+                        <select name="bulan" class="form-input-modern">
+                            <option>JANUARI</option><option>FEBRUARI</option><option>MAC</option><option selected>APRIL</option>
+                            <option>MEI</option><option>JUN</option><option>JULAI</option><option>OGOS</option>
+                            <option>SEPTEMBER</option><option>OKTOBER</option><option>NOVEMBER</option><option>DISEMBER</option>
+                        </select>
+                    </div>
+                    <div class="lg:col-span-2"><label class="text-[8px] font-black text-slate-400 uppercase">Penguatkuasa</label><input type="text" name="penguatkuasa" id="caseOfficer" class="form-input-modern" value="AHMAD FIRDAUS BIN ALI"></div>
+                    <div><label class="text-[8px] font-black text-slate-400 uppercase">Kategori Kes</label><input type="text" name="kategori_kes" class="form-input-modern" placeholder="PENYELUDUPAN"></div>
                     
-                    <div class="lg:col-span-2"><label class="text-[10px] font-black text-slate-500 mb-2 block uppercase">No Repot Polis</label><input type="text" class="form-input-modern" placeholder="RPT/KV/..."></div>
-                    <div><label class="text-[10px] font-black text-slate-500 mb-2 block uppercase">Tarikh Kejadian</label><input type="date" class="form-input-modern"></div>
-                    <div><label class="text-[10px] font-black text-slate-500 mb-2 block uppercase">Masa Kejadian</label><input type="time" class="form-input-modern"></div>
-                    <div class="lg:col-span-2"><label class="text-[10px] font-black text-slate-500 mb-2 block uppercase">Lokasi Kejadian</label><input type="text" class="form-input-modern" placeholder="Alamat / Koordinat"></div>
-
-                    <div class="lg:col-span-2"><label class="text-[10px] font-black text-slate-500 mb-2 block uppercase">Kesalahan</label><input type="text" class="form-input-modern"></div>
-                    <div class="lg:col-span-2"><label class="text-[10px] font-black text-slate-500 mb-2 block uppercase">Undang-Undang</label><input type="text" class="form-input-modern" placeholder="Akta / Seksyen"></div>
-                    <div><label class="text-[10px] font-black text-slate-500 mb-2 block uppercase">No Kes IP</label><input type="text" class="form-input-modern" placeholder="IP/2024/..."></div>
-                    <div><label class="text-[10px] font-black text-slate-500 mb-2 block uppercase">Jenis Rampasan</label><input type="text" class="form-input-modern"></div>
-                </div>
-            </div>
-
-            <!-- 2. RAMPASAN HAIWAN HIDUP (COLORFUL INFOGRAPHICS) -->
-            <div class="card-glass p-8 mb-10">
-                <div class="section-header">
-                    <span class="text-3xl">🐄</span>
-                    <div>
-                        <h3 class="font-black text-emerald-800 uppercase text-lg leading-none">RAMPASAN HAIWAN HIDUP (EKOR)</h3>
-                        <p class="text-[10px] font-bold text-emerald-600 mt-1">PENGIRAAN BERDASARKAN UNIT EKOR</p>
-                    </div>
-                </div>
-                <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-6">
-                    <!-- Infographic Card -->
-                    <div class="bg-white p-5 rounded-[25px] border-b-4 border-orange-400 text-center shadow-sm">
-                        <div class="realistic-icon mb-3">🐄</div>
-                        <p class="text-[10px] font-black text-slate-400 uppercase">Lembu</p>
-                        <input type="number" value="0" class="w-full text-center text-xl font-black bg-transparent outline-none">
-                    </div>
-                    <div class="bg-white p-5 rounded-[25px] border-b-4 border-blue-400 text-center shadow-sm">
-                        <div class="realistic-icon mb-3">🐃</div>
-                        <p class="text-[10px] font-black text-slate-400 uppercase">Kerbau</p>
-                        <input type="number" value="0" class="w-full text-center text-xl font-black bg-transparent outline-none">
-                    </div>
-                    <div class="bg-white p-5 rounded-[25px] border-b-4 border-amber-400 text-center shadow-sm">
-                        <div class="realistic-icon mb-3">🐐</div>
-                        <p class="text-[10px] font-black text-slate-400 uppercase">Kambing</p>
-                        <input type="number" value="0" class="w-full text-center text-xl font-black bg-transparent outline-none">
-                    </div>
-                    <div class="bg-white p-5 rounded-[25px] border-b-4 border-sky-400 text-center shadow-sm">
-                        <div class="realistic-icon mb-3">🐑</div>
-                        <p class="text-[10px] font-black text-slate-400 uppercase">Bebiri</p>
-                        <input type="number" value="0" class="w-full text-center text-xl font-black bg-transparent outline-none">
-                    </div>
-                    <div class="bg-white p-5 rounded-[25px] border-b-4 border-pink-400 text-center shadow-sm">
-                        <div class="realistic-icon mb-3">🐖</div>
-                        <p class="text-[10px] font-black text-slate-400 uppercase">Babi</p>
-                        <input type="number" value="0" class="w-full text-center text-xl font-black bg-transparent outline-none">
-                    </div>
-                    <div class="bg-white p-5 rounded-[25px] border-b-4 border-yellow-400 text-center shadow-sm">
-                        <div class="realistic-icon mb-3">🐔</div>
-                        <p class="text-[10px] font-black text-slate-400 uppercase">Ayam</p>
-                        <input type="number" value="0" class="w-full text-center text-xl font-black bg-transparent outline-none">
-                    </div>
-                    <!-- Small Pets -->
-                    <div class="bg-white p-5 rounded-[25px] border-b-4 border-slate-300 text-center shadow-sm opacity-80">
-                        <div class="realistic-icon mb-3 text-2xl">🐕</div>
-                        <p class="text-[9px] font-black text-slate-400 uppercase">Anjing</p>
-                        <input type="number" value="0" class="w-full text-center text-lg font-bold bg-transparent outline-none">
-                    </div>
-                    <div class="bg-white p-5 rounded-[25px] border-b-4 border-slate-300 text-center shadow-sm opacity-80">
-                        <div class="realistic-icon mb-3 text-2xl">🐈</div>
-                        <p class="text-[9px] font-black text-slate-400 uppercase">Kucing</p>
-                        <input type="number" value="0" class="w-full text-center text-lg font-bold bg-transparent outline-none">
-                    </div>
-                    <div class="bg-white p-5 rounded-[25px] border-b-4 border-slate-300 text-center shadow-sm opacity-80">
-                        <div class="realistic-icon mb-3 text-2xl">🐇</div>
-                        <p class="text-[9px] font-black text-slate-400 uppercase">Arnab</p>
-                        <input type="number" value="0" class="w-full text-center text-lg font-bold bg-transparent outline-none">
-                    </div>
-                    <div class="bg-white p-5 rounded-[25px] border-b-4 border-slate-300 text-center shadow-sm opacity-80">
-                        <div class="realistic-icon mb-3 text-2xl">🦜</div>
-                        <p class="text-[9px] font-black text-slate-400 uppercase">Burung</p>
-                        <input type="number" value="0" class="w-full text-center text-lg font-bold bg-transparent outline-none">
-                    </div>
-                    <div class="bg-white p-5 rounded-[25px] border-b-4 border-slate-300 text-center shadow-sm opacity-80">
-                        <div class="realistic-icon mb-3 text-2xl">🐹</div>
-                        <p class="text-[9px] font-black text-slate-400 uppercase">Hamster</p>
-                        <input type="number" value="0" class="w-full text-center text-lg font-bold bg-transparent outline-none">
-                    </div>
-                </div>
-            </div>
-
-            <!-- 3. KARKAS & PRODUK SEJUK BEKU -->
-            <div class="card-glass p-8 mb-10">
-                <div class="section-header">
-                    <span class="text-3xl">🧊</span>
-                    <div>
-                        <h3 class="font-black text-blue-800 uppercase text-lg leading-none">KARKAS & PRODUK SEJUK BEKU</h3>
-                        <p class="text-[10px] font-bold text-blue-400 mt-1">PRODUK YANG TELAH DIPROSES / DIBEKUKAN</p>
-                    </div>
-                </div>
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
-                    <div class="flex items-center gap-3 bg-white p-3 rounded-2xl border border-slate-100">
-                        <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">🥩</div>
-                        <div class="flex-1">
-                            <label class="text-[9px] font-bold text-slate-400 uppercase">Karkas Lembu</label>
-                            <input type="number" class="w-full font-black outline-none" value="0">
-                        </div>
-                    </div>
-                    <div class="flex items-center gap-3 bg-white p-3 rounded-2xl border border-slate-100">
-                        <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">🥩</div>
-                        <div class="flex-1">
-                            <label class="text-[9px] font-bold text-slate-400 uppercase">Karkas Kerbau</label>
-                            <input type="number" class="w-full font-black outline-none" value="0">
-                        </div>
-                    </div>
-                    <div class="flex items-center gap-3 bg-white p-3 rounded-2xl border border-slate-100">
-                        <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">🥩</div>
-                        <div class="flex-1">
-                            <label class="text-[9px] font-bold text-slate-400 uppercase">Karkas Kambing</label>
-                            <input type="number" class="w-full font-black outline-none" value="0">
-                        </div>
-                    </div>
-                    <div class="flex items-center gap-3 bg-white p-3 rounded-2xl border border-slate-100">
-                        <div class="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center">🥩</div>
-                        <div class="flex-1">
-                            <label class="text-[9px] font-bold text-slate-400 uppercase">Karkas Babi</label>
-                            <input type="number" class="w-full font-black outline-none" value="0">
-                        </div>
-                    </div>
-                    <div class="flex items-center gap-3 bg-white p-3 rounded-2xl border border-slate-100">
-                        <div class="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center">❄️</div>
-                        <div class="flex-1">
-                            <label class="text-[8px] font-bold text-slate-400 uppercase">Karkas Babi SB</label>
-                            <input type="number" class="w-full font-black outline-none" value="0">
-                        </div>
-                    </div>
-                    <div class="flex items-center gap-3 bg-white p-3 rounded-2xl border border-slate-100">
-                        <div class="w-10 h-10 bg-yellow-100 rounded-lg flex items-center justify-center">🍗</div>
-                        <div class="flex-1">
-                            <label class="text-[9px] font-bold text-slate-400 uppercase">Karkas Ayam</label>
-                            <input type="number" class="w-full font-black outline-none" value="0">
-                        </div>
-                    </div>
-                    <div class="flex items-center gap-3 bg-white p-3 rounded-2xl border border-slate-100">
-                        <div class="w-10 h-10 bg-indigo-100 rounded-lg flex items-center justify-center">🦆</div>
-                        <div class="flex-1">
-                            <label class="text-[8px] font-bold text-slate-400 uppercase">Prod SB Itik</label>
-                            <input type="number" class="w-full font-black outline-none" value="0">
-                        </div>
-                    </div>
-                    <div class="flex items-center gap-3 bg-white p-3 rounded-2xl border border-slate-100">
-                        <div class="w-10 h-10 bg-indigo-100 rounded-lg flex items-center justify-center">🍗</div>
-                        <div class="flex-1">
-                            <label class="text-[8px] font-bold text-slate-400 uppercase">Prod SB Ayam</label>
-                            <input type="number" class="w-full font-black outline-none" value="0">
-                        </div>
-                    </div>
-                    <div class="flex items-center gap-3 bg-white p-3 rounded-2xl border border-slate-100">
-                        <div class="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center">❄️</div>
-                        <div class="flex-1">
-                            <label class="text-[8px] font-bold text-slate-400 uppercase">Prod SB Babi</label>
-                            <input type="number" class="w-full font-black outline-none" value="0">
-                        </div>
-                    </div>
-                    <div class="flex items-center gap-3 bg-white p-3 rounded-2xl border border-slate-100">
-                        <div class="w-10 h-10 bg-slate-200 rounded-lg flex items-center justify-center">🥫</div>
-                        <div class="flex-1">
-                            <label class="text-[8px] font-bold text-slate-400 uppercase">Prod Haiwan (Tin)</label>
-                            <input type="number" class="w-full font-black outline-none" value="0">
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- 4. LOGISTIK & ANGGARAN NILAI -->
-            <div class="card-glass p-8 mb-10">
-                <div class="section-header">
-                    <span class="text-3xl">💹</span>
-                    <div>
-                        <h3 class="font-black text-slate-800 uppercase text-lg leading-none">LOGISTIK & ANGGARAN NILAI (RM)</h3>
-                        <p class="text-[10px] font-bold text-slate-400 mt-1">PENYELARASAN NILAI PASARAN SEMASA</p>
-                    </div>
-                </div>
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                    <div class="lg:col-span-2"><label class="text-[8px] font-black text-slate-400 uppercase">No Repot Polis</label><input type="text" name="repot_polis" class="form-input-modern" placeholder="ST/00123/24"></div>
+                    <div><label class="text-[8px] font-black text-slate-400 uppercase">Tarikh Kejadian</label><input type="date" name="tarikh_kejadian" class="form-input-modern" value="2024-04-25"></div>
+                    <div><label class="text-[8px] font-black text-slate-400 uppercase">Masa Kejadian</label><input type="time" name="masa_kejadian" class="form-input-modern" value="14:30"></div>
+                    
                     <div class="lg:col-span-2">
-                        <label class="text-[10px] font-black text-slate-400 uppercase mb-2 block">Rampasan Lain-Lain</label>
-                        <input type="text" class="form-input-modern" placeholder="Cth: Sangkar, Peralatan, Tag">
+                        <label class="text-[8px] font-black text-slate-400 uppercase">Lokasi Kejadian</label>
+                        <div class="flex gap-1">
+                            <input type="text" id="lokasi_kejadian" name="lokasi_kejadian" class="form-input-modern" placeholder="Cth: JALAN PADANG BESAR, PERLIS">
+                            <button type="button" onclick="getCurrentLocation()" class="p-2 bg-blue-50 text-blue-600 rounded-lg no-print"><i data-lucide="map-pin" class="w-3 h-3"></i></button>
+                        </div>
                     </div>
-                    <div>
-                        <label class="text-[10px] font-black text-slate-400 uppercase mb-2 block">Jum. Rampasan Kenderaan</label>
-                        <input type="number" class="form-input-modern" placeholder="0">
-                    </div>
-                    <div>
-                        <label class="text-[10px] font-black text-slate-400 uppercase mb-2 block">Kes Serahan</label>
-                        <input type="text" class="form-input-modern" placeholder="Nama Penerima / Jabatan">
-                    </div>
-                </div>
 
-                <!-- Nilai RM (Realistic Infographic Feel) -->
-                <div class="grid grid-cols-1 md:grid-cols-5 gap-3 bg-slate-900 p-6 rounded-[35px] text-white shadow-2xl">
-                    <div class="p-3 bg-white/5 rounded-2xl">
-                        <p class="text-[8px] font-bold text-slate-400 uppercase">Angg. Nilai (Ekor/KG)</p>
-                        <input type="number" id="v_animal" class="bg-transparent w-full text-lg font-black outline-none border-b border-white/20" value="0">
-                    </div>
-                    <div class="p-3 bg-white/5 rounded-2xl">
-                        <p class="text-[8px] font-bold text-slate-400 uppercase">Angg. Nilai (Kenderaan)</p>
-                        <input type="number" id="v_vehicle" class="bg-transparent w-full text-lg font-black outline-none border-b border-white/20" value="0">
-                    </div>
-                    <div class="p-3 bg-white/5 rounded-2xl">
-                        <p class="text-[8px] font-bold text-slate-400 uppercase">Angg. Nilai (Peng/Kon)</p>
-                        <input type="number" id="v_cargo" class="bg-transparent w-full text-lg font-black outline-none border-b border-white/20" value="0">
-                    </div>
-                    <div class="p-3 bg-white/5 rounded-2xl">
-                        <p class="text-[8px] font-bold text-slate-400 uppercase">Angg. Nilai (Lain-Lain)</p>
-                        <input type="number" id="v_other" class="bg-transparent w-full text-lg font-black outline-none border-b border-white/20" value="0">
-                    </div>
-                    <div class="p-3 bg-blue-600 rounded-2xl flex flex-col justify-center">
-                        <p class="text-[8px] font-black text-blue-200 uppercase mb-1">Jumlah Nilai Keseluruhan</p>
-                        <input type="text" id="v_total" readonly class="bg-transparent w-full text-2xl font-black outline-none" value="RM 0.00">
-                    </div>
+                    <div class="lg:col-span-2"><label class="text-[8px] font-black text-slate-400 uppercase">Kesalahan</label><input type="text" name="kesalahan" class="form-input-modern" placeholder="PINDAH TERNAKAN TANPA PERMIT"></div>
+                    <div class="lg:col-span-2"><label class="text-[8px] font-black text-slate-400 uppercase">Undang-Undang</label><input type="text" name="undang_undang" class="form-input-modern" placeholder="AKTA BINATANG 1953"></div>
+                    <div><label class="text-[8px] font-black text-slate-400 uppercase">No Kes IP</label><input type="text" name="no_ip" class="form-input-modern" placeholder="IP/BPK/HQ/2024/045"></div>
+                    <div><label class="text-[8px] font-black text-slate-400 uppercase">Jenis Rampasan</label><input type="text" name="jenis_rampasan" class="form-input-modern" placeholder="HAIWAN HIDUP & LORI"></div>
                 </div>
+                <div id="map" class="no-print"></div>
+            </div>
 
-                <div class="mt-8">
-                    <label class="text-[10px] font-black text-slate-400 uppercase mb-2 block">Catatan Tambahan</label>
-                    <textarea class="form-input-modern h-24" placeholder="Ulasan lanjut pegawai..."></textarea>
+            <!-- SECTION B: HAIWAN HIDUP -->
+            <div class="card-glass p-6">
+                <div class="section-header border-emerald-100">
+                    <img src="https://cdn-icons-png.flaticon.com/512/1998/1998664.png" class="w-8 h-8" alt="Animal">
+                    <h3 class="font-black text-emerald-800 uppercase text-xs">B. Rampasan Haiwan Hidup (Ekor)</h3>
+                </div>
+                <div class="grid grid-cols-3 md:grid-cols-6 lg:grid-cols-11 gap-2">
+                    <div class="animal-card border-b-2 border-orange-400">
+                        <img src="https://cdn-icons-png.flaticon.com/512/1998/1998671.png" class="w-7 mx-auto mb-1">
+                        <label class="text-[6px] font-black uppercase text-slate-400">Lembu</label>
+                        <input type="number" name="h_lembu" class="w-full text-center font-bold outline-none text-xs" value="0" placeholder="0">
+                    </div>
+                    <div class="animal-card border-b-2 border-slate-500">
+                        <img src="https://cdn-icons-png.flaticon.com/512/2395/2395796.png" class="w-7 mx-auto mb-1">
+                        <label class="text-[6px] font-black uppercase text-slate-400">Kerbau</label>
+                        <input type="number" name="h_kerbau" class="w-full text-center font-bold outline-none text-xs" value="0" placeholder="0">
+                    </div>
+                    <div class="animal-card border-b-2 border-amber-500">
+                        <img src="https://cdn-icons-png.flaticon.com/512/1998/1998675.png" class="w-7 mx-auto mb-1">
+                        <label class="text-[6px] font-black uppercase text-slate-400">Kambing</label>
+                        <input type="number" name="h_kambing" class="w-full text-center font-bold outline-none text-xs" value="0" placeholder="0">
+                    </div>
+                    <div class="animal-card border-b-2 border-blue-400">
+                        <img src="https://cdn-icons-png.flaticon.com/512/1998/1998781.png" class="w-7 mx-auto mb-1">
+                        <label class="text-[6px] font-black uppercase text-slate-400">Bebiri</label>
+                        <input type="number" name="h_bebiri" class="w-full text-center font-bold outline-none text-xs" value="0" placeholder="0">
+                    </div>
+                    <div class="animal-card border-b-2 border-pink-400">
+                        <img src="https://cdn-icons-png.flaticon.com/512/1998/1998713.png" class="w-7 mx-auto mb-1">
+                        <label class="text-[6px] font-black uppercase text-slate-400">Babi</label>
+                        <input type="number" name="h_babi" class="w-full text-center font-bold outline-none text-xs" value="0" placeholder="0">
+                    </div>
+                    <div class="animal-card border-b-2 border-yellow-400">
+                        <img src="https://cdn-icons-png.flaticon.com/512/1998/1998610.png" class="w-7 mx-auto mb-1">
+                        <label class="text-[6px] font-black uppercase text-slate-400">Ayam</label>
+                        <input type="number" name="h_ayam" class="w-full text-center font-bold outline-none text-xs" value="0" placeholder="0">
+                    </div>
+                    <div class="animal-card border-b-2 border-red-400">
+                        <img src="https://cdn-icons-png.flaticon.com/512/1998/1998627.png" class="w-7 mx-auto mb-1">
+                        <label class="text-[6px] font-black uppercase text-slate-400">Anjing</label>
+                        <input type="number" name="h_anjing" class="w-full text-center font-bold outline-none text-xs" value="0" placeholder="0">
+                    </div>
+                    <div class="animal-card border-b-2 border-indigo-400">
+                        <img src="https://cdn-icons-png.flaticon.com/512/1998/1998592.png" class="w-7 mx-auto mb-1">
+                        <label class="text-[6px] font-black uppercase text-slate-400">Kucing</label>
+                        <input type="number" name="h_kucing" class="w-full text-center font-bold outline-none text-xs" value="0" placeholder="0">
+                    </div>
+                    <div class="animal-card border-b-2 border-emerald-400">
+                        <img src="https://cdn-icons-png.flaticon.com/512/1998/1998748.png" class="w-7 mx-auto mb-1">
+                        <label class="text-[6px] font-black uppercase text-slate-400">Arnab</label>
+                        <input type="number" name="h_arnab" class="w-full text-center font-bold outline-none text-xs" value="0" placeholder="0">
+                    </div>
+                    <div class="animal-card border-b-2 border-sky-400">
+                        <img src="https://cdn-icons-png.flaticon.com/512/1998/1998725.png" class="w-7 mx-auto mb-1">
+                        <label class="text-[6px] font-black uppercase text-slate-400">Burung</label>
+                        <input type="number" name="h_burung" class="w-full text-center font-bold outline-none text-xs" value="0" placeholder="0">
+                    </div>
+                    <div class="animal-card border-b-2 border-purple-400">
+                        <img src="https://cdn-icons-png.flaticon.com/512/1998/1998656.png" class="w-7 mx-auto mb-1">
+                        <label class="text-[6px] font-black uppercase text-slate-400">Hamster</label>
+                        <input type="number" name="h_hamster" class="w-full text-center font-bold outline-none text-xs" value="0" placeholder="0">
+                    </div>
                 </div>
             </div>
 
-            <!-- ACTION BUTTONS -->
-            <div class="flex justify-end gap-4 no-print pb-20">
-                <button type="reset" class="px-8 py-4 font-bold text-slate-500 hover:text-slate-800 transition">PADAM SEMUA</button>
-                <button type="button" class="px-12 py-4 bg-gradient-to-r from-blue-700 to-blue-500 text-white rounded-2xl font-black shadow-xl shadow-blue-300 hover:scale-105 transition flex items-center gap-2">
-                    <i data-lucide="save"></i> SIMPAN REKOD KES
-                </button>
+            <!-- SECTION C: KARKAS -->
+            <div class="card-glass p-6">
+                <div class="section-header border-blue-100">
+                    <img src="https://cdn-icons-png.flaticon.com/512/3082/3082011.png" class="w-8 h-8" alt="Frozen">
+                    <h3 class="font-black text-blue-800 uppercase text-xs">C. Karkas & Produk Sejuk Beku</h3>
+                </div>
+                <div class="grid grid-cols-2 md:grid-cols-5 gap-3">
+                    <div class="bg-blue-50/50 p-2 rounded-xl border border-blue-100 flex items-center gap-2">
+                        <span class="text-lg">🥩</span>
+                        <div>
+                            <label class="text-[7px] font-black text-blue-600 block uppercase">Karkas Lembu</label>
+                            <input type="number" name="p_klembu" class="w-full font-bold outline-none text-xs bg-transparent" value="0" placeholder="0">
+                        </div>
+                    </div>
+                    <div class="bg-blue-50/50 p-2 rounded-xl border border-blue-100 flex items-center gap-2">
+                        <span class="text-lg">🥩</span>
+                        <div>
+                            <label class="text-[7px] font-black text-blue-600 block uppercase">Karkas Kerbau</label>
+                            <input type="number" name="p_kkerbau" class="w-full font-bold outline-none text-xs bg-transparent" value="0" placeholder="0">
+                        </div>
+                    </div>
+                    <div class="bg-blue-50/50 p-2 rounded-xl border border-blue-100 flex items-center gap-2">
+                        <span class="text-lg">🥩</span>
+                        <div>
+                            <label class="text-[7px] font-black text-blue-600 block uppercase">Karkas Kambing</label>
+                            <input type="number" name="p_kkambing" class="w-full font-bold outline-none text-xs bg-transparent" value="0" placeholder="0">
+                        </div>
+                    </div>
+                    <div class="bg-blue-50/50 p-2 rounded-xl border border-blue-100 flex items-center gap-2">
+                        <span class="text-lg">🥩</span>
+                        <div>
+                            <label class="text-[7px] font-black text-blue-600 block uppercase">Karkas Babi</label>
+                            <input type="number" name="p_kbabi" class="w-full font-bold outline-none text-xs bg-transparent" value="0" placeholder="0">
+                        </div>
+                    </div>
+                    <div class="bg-red-50/50 p-2 rounded-xl border border-red-100 flex items-center gap-2">
+                        <span class="text-lg">❄️</span>
+                        <div>
+                            <label class="text-[7px] font-black text-red-600 block uppercase">Karkas Babi SB</label>
+                            <input type="number" name="p_kbabisb" class="w-full font-bold outline-none text-xs bg-transparent" value="0" placeholder="0">
+                        </div>
+                    </div>
+                    <div class="bg-blue-50/50 p-2 rounded-xl border border-blue-100 flex items-center gap-2">
+                        <span class="text-lg">🍗</span>
+                        <div>
+                            <label class="text-[7px] font-black text-blue-600 block uppercase">Karkas Ayam</label>
+                            <input type="number" name="p_kayam" class="w-full font-bold outline-none text-xs bg-transparent" value="0" placeholder="0">
+                        </div>
+                    </div>
+                    <div class="bg-blue-50/50 p-2 rounded-xl border border-blue-100 flex items-center gap-2">
+                        <span class="text-lg">🦆</span>
+                        <div>
+                            <label class="text-[7px] font-black text-blue-600 block uppercase">SB Itik</label>
+                            <input type="number" name="p_sbitik" class="w-full font-bold outline-none text-xs bg-transparent" value="0" placeholder="0">
+                        </div>
+                    </div>
+                    <div class="bg-blue-50/50 p-2 rounded-xl border border-blue-100 flex items-center gap-2">
+                        <span class="text-lg">🍗</span>
+                        <div>
+                            <label class="text-[7px] font-black text-blue-600 block uppercase">SB Ayam</label>
+                            <input type="number" name="p_sbayam" class="w-full font-bold outline-none text-xs bg-transparent" value="0" placeholder="0">
+                        </div>
+                    </div>
+                    <div class="bg-blue-50/50 p-2 rounded-xl border border-blue-100 flex items-center gap-2">
+                        <span class="text-lg">🐖</span>
+                        <div>
+                            <label class="text-[7px] font-black text-blue-600 block uppercase">SB Babi</label>
+                            <input type="number" name="p_sbbabi" class="w-full font-bold outline-none text-xs bg-transparent" value="0" placeholder="0">
+                        </div>
+                    </div>
+                    <div class="bg-slate-100 p-2 rounded-xl border border-slate-200 flex items-center gap-2">
+                        <span class="text-lg">🥫</span>
+                        <div>
+                            <label class="text-[7px] font-black text-slate-500 block uppercase">Produk Haiwan (Tin)</label>
+                            <input type="number" name="p_tin" class="w-full font-bold outline-none text-xs bg-transparent" value="0" placeholder="0">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECTION D: LOGISTIK & NILAI -->
+            <div class="card-glass p-6">
+                <div class="section-header border-slate-100">
+                    <img src="https://cdn-icons-png.flaticon.com/512/2830/2830312.png" class="w-8 h-8" alt="Logistic">
+                    <h3 class="font-black text-slate-800 uppercase text-xs">D. Logistik & Anggaran Nilai (RM)</h3>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mb-6">
+                    <div><label class="text-[8px] font-black text-slate-400 uppercase">Rampasan Lain-Lain</label><input type="text" name="rampasan_lain" class="form-input-modern" placeholder="Cth: 1 UNIT SMARTPHONE, 2 UNIT PARANG"></div>
+                    <div><label class="text-[8px] font-black text-slate-400 uppercase">Jumlah Rampasan Kenderaan</label><input type="number" name="bil_kenderaan" class="form-input-modern" value="0" placeholder="1"></div>
+                    <div><label class="text-[8px] font-black text-slate-400 uppercase">Kes Serahan Kepada</label><input type="text" name="kes_serahan" class="form-input-modern" placeholder="JPV NEGERI / PDRM"></div>
+                </div>
+
+                <div class="grid grid-cols-2 md:grid-cols-5 gap-3 bg-slate-900 p-5 rounded-3xl text-white shadow-2xl">
+                    <div class="p-2 border-r border-white/10">
+                        <p class="text-[7px] text-slate-400 uppercase font-black mb-1">Angg. Nilai (Ekor/KG)</p>
+                        <input type="number" id="v_animal" name="v_animal" class="bg-transparent w-full font-black outline-none text-lg border-b border-white/20" value="0" placeholder="5000">
+                    </div>
+                    <div class="p-2 border-r border-white/10">
+                        <p class="text-[7px] text-slate-400 uppercase font-black mb-1">Angg. Nilai (Kenderaan)</p>
+                        <input type="number" id="v_vehicle" name="v_vehicle" class="bg-transparent w-full font-black outline-none text-lg border-b border-white/20" value="0" placeholder="80000">
+                    </div>
+                    <div class="p-2 border-r border-white/10">
+                        <p class="text-[7px] text-slate-400 uppercase font-black mb-1">Angg. Nilai (Peng/Kon)</p>
+                        <input type="number" id="v_cargo" name="v_cargo" class="bg-transparent w-full font-black outline-none text-lg border-b border-white/20" value="0" placeholder="2000">
+                    </div>
+                    <div class="p-2 border-r border-white/10">
+                        <p class="text-[7px] text-slate-400 uppercase font-black mb-1">Angg. Nilai (Lain-Lain)</p>
+                        <input type="number" id="v_other" name="v_other" class="bg-transparent w-full font-black outline-none text-lg border-b border-white/20" value="0" placeholder="500">
+                    </div>
+                    <div class="bg-blue-600 p-3 rounded-2xl">
+                        <p class="text-[7px] text-blue-100 uppercase font-black mb-1">Jumlah Nilai Keseluruhan</p>
+                        <input type="text" id="v_total" name="v_total_hidden" readonly class="bg-transparent w-full text-xl font-black outline-none" value="RM 0.00">
+                    </div>
+                </div>
+                <div class="mt-4"><label class="text-[8px] font-black text-slate-400 uppercase">Catatan</label><textarea name="catatan" class="form-input-modern h-16" placeholder="Sila masukkan maklumat tambahan atau ringkasan kronologi kes di sini..."></textarea></div>
+            </div>
+
+            <!-- BUTTON ACTIONS -->
+            <div class="flex justify-between items-center no-print mt-8 pb-10">
+                <button type="button" onclick="clearForm()" class="text-slate-400 font-bold text-xs uppercase hover:text-red-500 transition">Borang Baru / Kosongkan</button>
+                <div class="flex gap-3">
+                    <!-- ADDED: DELETE CURRENT BUTTON -->
+                    <button id="btnDeleteCurrent" type="button" onclick="deleteCurrentRecord()" class="hidden px-6 py-4 bg-red-50 text-red-600 rounded-2xl font-black text-sm uppercase border border-red-100 hover:bg-red-100 transition">
+                        Hapus Rekod Ini
+                    </button>
+                    <button type="button" onclick="saveData()" class="px-10 py-4 bg-indigo-600 text-white rounded-2xl font-black text-sm uppercase shadow-xl hover:scale-105 transition flex items-center gap-2">
+                        <i data-lucide="save"></i> Simpan Rekod Kes
+                    </button>
+                </div>
             </div>
         </form>
 
+        <!-- RECORD TABLE -->
+        <div class="card-glass p-8 no-print">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="font-black text-slate-800 uppercase text-xs flex items-center gap-2">
+                    <i data-lucide="database" class="text-blue-600"></i> Rekod Tersimpan Dalam Sistem
+                </h3>
+                <!-- ADDED: DELETE ALL BUTTON -->
+                <button onclick="deleteAllRecords()" class="text-[9px] font-bold text-red-400 uppercase hover:text-red-600 transition flex items-center gap-1">
+                    <i data-lucide="trash-2" class="w-3 h-3"></i> Padam Semua Rekod
+                </button>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-[10px]">
+                    <thead class="bg-slate-50 uppercase text-slate-500 font-bold">
+                        <tr class="border-b">
+                            <th class="p-3">Bil/Tahun</th>
+                            <th class="p-3">Polis/IP</th>
+                            <th class="p-3">Lokasi</th>
+                            <th class="p-3">Jumlah Nilai (RM)</th>
+                            <th class="p-3 text-center">Tindakan</th>
+                        </tr>
+                    </thead>
+                    <tbody id="recordTable" class="divide-y divide-slate-100"></tbody>
+                </table>
+            </div>
+        </div>
     </main>
 
-    <!-- FOOTER -->
-    <footer class="bg-white/80 border-t border-gray-200 py-6 text-center no-print">
-        <p class="text-xs font-bold text-slate-400 uppercase tracking-widest">&copy; 2024 JPV - BAHAGIAN PENGUATKUASA (BPK) | KERAJAAN MALAYSIA</p>
+    <footer class="text-center py-8 text-[9px] font-bold text-slate-400 uppercase no-print">
+        &copy; 2024 JPV - Bahagian Penguatkuasa | v1.8.0
     </footer>
 
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
-        // Init Lucide Icons
         lucide.createIcons();
 
-        // Autohide Profile Toggle
-        function toggleProfile() {
-            document.getElementById('profileSidebar').classList.toggle('active');
+        // MAPS
+        const map = L.map('map').setView([3.1390, 101.6869], 11);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+        let marker;
+        map.on('click', function(e) {
+            if (marker) map.removeLayer(marker);
+            marker = L.marker(e.latlng).addTo(map);
+            document.getElementById('lokasi_kejadian').value = `${e.latlng.lat.toFixed(6)}, ${e.latlng.lng.toFixed(6)}`;
+        });
+
+        function getCurrentLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(pos => {
+                    const { latitude, longitude } = pos.coords;
+                    map.setView([latitude, longitude], 15);
+                    if (marker) map.removeLayer(marker);
+                    marker = L.marker([latitude, longitude]).addTo(map);
+                    document.getElementById('lokasi_kejadian').value = `${latitude.toFixed(6)}, ${longitude.toFixed(6)}`;
+                });
+            }
         }
 
-        // Real-time 12-Hour Clock
+        // PROFILE LOGIC
+        function toggleProfile() { document.getElementById('profileSidebar').classList.toggle('active'); }
+        
+        function updateProfileDisplay() {
+            const name = document.getElementById('userName').value;
+            const gred = document.getElementById('userGred').value;
+            document.getElementById('navName').innerText = name.split(' ')[0] + ' ' + (name.split(' ')[1] || '');
+            document.getElementById('navGred').innerText = gred;
+            document.getElementById('caseOfficer').value = name;
+            saveProfileInfo();
+        }
+
+        function saveProfileInfo() {
+            const profileData = {
+                name: document.getElementById('userName').value,
+                gred: document.getElementById('userGred').value,
+                cawangan: document.getElementById('userCawangan').value
+            };
+            localStorage.setItem('bpk_user_profile', JSON.stringify(profileData));
+        }
+
+        function previewImage(input) {
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = e => {
+                    const base64Image = e.target.result;
+                    document.getElementById('sideAvatar').src = base64Image;
+                    document.getElementById('navAvatar').src = base64Image;
+                    localStorage.setItem('bpk_user_avatar', base64Image);
+                }
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        function loadSavedProfile() {
+            const savedAvatar = localStorage.getItem('bpk_user_avatar');
+            if (savedAvatar) {
+                document.getElementById('sideAvatar').src = savedAvatar;
+                document.getElementById('navAvatar').src = savedAvatar;
+            }
+            const savedInfo = localStorage.getItem('bpk_user_profile');
+            if (savedInfo) {
+                const data = JSON.parse(savedInfo);
+                document.getElementById('userName').value = data.name;
+                document.getElementById('userGred').value = data.gred;
+                document.getElementById('userCawangan').value = data.cawangan;
+                document.getElementById('navName').innerText = data.name.split(' ')[0] + ' ' + (data.name.split(' ')[1] || '');
+                document.getElementById('navGred').innerText = data.gred;
+                document.getElementById('caseOfficer').value = data.name;
+            }
+        }
+
+        // COMPOSE EMAIL
+        function composeEmail() {
+            const name = document.getElementById('userName').value;
+            const cawangan = document.getElementById('userCawangan').value;
+            const subject = encodeURIComponent(`Laporan Kes Penguatkuasaan - ${name}`);
+            const body = encodeURIComponent(`Tuan/Puan,\n\nBerikut dilampirkan ringkasan laporan kes dari cawangan ${cawangan}.\n\nPegawai: ${name}\nTarikh: ${new Date().toLocaleDateString()}\n\nSila rujuk sistem e-Penguatkuasa untuk maklumat lanjut.`);
+            window.location.href = `mailto:?subject=${subject}&body=${body}`;
+        }
+
+        // DATA STORAGE LOGIC
+        let db = JSON.parse(localStorage.getItem('bpk_v18_db')) || [];
+
+        function saveData() {
+            const form = document.getElementById('mainForm');
+            const formData = new FormData(form);
+            const data = Object.fromEntries(formData.entries());
+            
+            // Check if it's an update or a new record
+            const recordId = document.getElementById('current_record_id').value;
+            
+            if (recordId) {
+                // Update existing
+                const index = db.findIndex(r => r.id == recordId);
+                data.id = Number(recordId);
+                data.total_rm = document.getElementById('v_total').value;
+                if (index !== -1) db[index] = data;
+            } else {
+                // Save new
+                data.id = Date.now();
+                data.total_rm = document.getElementById('v_total').value;
+                db.push(data);
+            }
+            
+            localStorage.setItem('bpk_v18_db', JSON.stringify(db));
+            alert('Rekod Berjaya Disimpan!');
+            renderTable();
+            clearForm();
+        }
+
+        function renderTable() {
+            const table = document.getElementById('recordTable');
+            table.innerHTML = db.slice().reverse().map(record => `
+                <tr class="hover:bg-slate-50 transition uppercase">
+                    <td class="p-3 font-bold">${record.bil || '-'}/${record.tahun || '-'}</td>
+                    <td class="p-3 font-semibold text-slate-600">${record.repot_polis || record.no_ip || 'DRAF'}</td>
+                    <td class="p-3 text-slate-400 truncate max-w-[200px]">${record.lokasi_kejadian || '-'}</td>
+                    <td class="p-3 font-black text-blue-600">${record.total_rm}</td>
+                    <td class="p-3 text-center flex gap-2 justify-center">
+                        <button onclick="loadRecord(${record.id})" class="p-2 bg-blue-50 text-blue-600 rounded-lg" title="Lihat Rekod"><i data-lucide="eye" class="w-3 h-3"></i></button>
+                        <button onclick="deleteRecord(${record.id})" class="p-2 bg-red-50 text-red-600 rounded-lg" title="Padam Rekod"><i data-lucide="trash" class="w-3 h-3"></i></button>
+                    </td>
+                </tr>
+            `).join('');
+            lucide.createIcons();
+        }
+
+        function loadRecord(id) {
+            const record = db.find(r => r.id === id);
+            if (record) {
+                const form = document.getElementById('mainForm');
+                Object.keys(record).forEach(key => {
+                    const input = form.querySelector(`[name="${key}"]`);
+                    if (input) input.value = record[key];
+                });
+                
+                // Track this ID and show delete button in form
+                document.getElementById('current_record_id').value = record.id;
+                document.getElementById('btnDeleteCurrent').classList.remove('hidden');
+                
+                calcTotal();
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        }
+
+        function deleteRecord(id) {
+            if(confirm('Hapus rekod ini secara kekal?')) {
+                db = db.filter(r => r.id !== id);
+                localStorage.setItem('bpk_v18_db', JSON.stringify(db));
+                renderTable();
+                if(document.getElementById('current_record_id').value == id) {
+                    clearForm();
+                }
+            }
+        }
+
+        // ADDED: DELETE CURRENT RECORD FROM FORM
+        function deleteCurrentRecord() {
+            const recordId = Number(document.getElementById('current_record_id').value);
+            if (recordId) {
+                deleteRecord(recordId);
+            }
+        }
+
+        // ADDED: DELETE ALL RECORDS
+        function deleteAllRecords() {
+            if(confirm('AMARAN: Anda pasti mahu memadam SEMUA rekod? Tindakan ini tidak boleh dibatalkan.')) {
+                db = [];
+                localStorage.setItem('bpk_v18_db', JSON.stringify(db));
+                renderTable();
+                clearForm();
+            }
+        }
+
+        function clearForm() {
+            document.getElementById('mainForm').reset();
+            document.getElementById('current_record_id').value = ""; // Reset ID
+            document.getElementById('btnDeleteCurrent').classList.add('hidden'); // Hide delete button
+            document.getElementById('caseOfficer').value = document.getElementById('userName').value;
+            if (marker) map.removeLayer(marker);
+            calcTotal();
+        }
+
+        function calcTotal() {
+            const fields = ['v_animal', 'v_vehicle', 'v_cargo', 'v_other'];
+            let total = 0;
+            fields.forEach(id => total += Number(document.getElementById(id).value || 0));
+            document.getElementById('v_total').value = "RM " + total.toLocaleString('en-MY', {minimumFractionDigits: 2});
+        }
+
+        ['v_animal', 'v_vehicle', 'v_cargo', 'v_other'].forEach(id => {
+            document.getElementById(id).addEventListener('input', calcTotal);
+        });
+
         function updateClock() {
             const now = new Date();
-            let hours = now.getHours();
-            let minutes = now.getMinutes();
-            let seconds = now.getSeconds();
-            const ampm = hours >= 12 ? 'PM' : 'AM';
-            
-            hours = hours % 12;
-            hours = hours ? hours : 12; // 0 becomes 12
-            minutes = minutes < 10 ? '0' + minutes : minutes;
-            seconds = seconds < 10 ? '0' + seconds : seconds;
-
-            document.getElementById('clock').innerText = `${hours}:${minutes}:${seconds} ${ampm}`;
-
-            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-            document.getElementById('current-date').innerText = now.toLocaleDateString('ms-MY', options);
+            document.getElementById('clock').innerText = now.toLocaleTimeString('en-US', { hour12: true });
+            document.getElementById('current-date').innerText = now.toLocaleDateString('ms-MY', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
         }
+
+        // INITIALIZATION
         setInterval(updateClock, 1000);
         updateClock();
-
-        // Auto Calc Total RM
-        const inputs = ['v_animal', 'v_vehicle', 'v_cargo', 'v_other'];
-        inputs.forEach(id => {
-            document.getElementById(id).addEventListener('input', () => {
-                let total = 0;
-                inputs.forEach(i => total += Number(document.getElementById(i).value || 0));
-                document.getElementById('v_total').value = "RM " + total.toLocaleString('en-MY', {minimumFractionDigits: 2});
-            });
-        });
+        renderTable();
+        loadSavedProfile(); 
     </script>
 </body>
 </html>
