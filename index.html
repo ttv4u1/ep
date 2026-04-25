@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>e-Penguatkuasa v31 | Dashboard BPK</title>
+    <title>e-Penguatkuasa v32 | Dashboard BPK</title>
     
     <link rel="icon" type="image/png" href="https://github.com/ttv4u1/KP/raw/main/Logo%20Penguatkuasa.png">
     <script src="https://cdn.tailwindcss.com"></script>
@@ -64,22 +64,55 @@
             font-weight: 800;
             color: #64748b;
             text-transform: uppercase;
-            margin-bottom: 4px;
+            margin-bottom: 2px;
             letter-spacing: 0.05em;
         }
 
         .animal-card-compact {
             background: #f1f5f9;
             border: 1px solid #e2e8f0;
-            border-radius: 12px;
-            padding: 6px 10px;
+            border-radius: 8px;
+            padding: 4px 8px;
         }
 
         #map { height: 250px; border-radius: 15px; margin-top: 10px; border: 2px solid #e2e8f0; }
 
+        /* PRINT SETTINGS - OPTIMIZED FOR A4 SINGLE PAGE */
         @media print {
-            .no-print { display: none !important; }
-            body { background: white !important; }
+            @page { size: A4; margin: 5mm; }
+            body { 
+                background: white !important; 
+                -webkit-print-color-adjust: exact; 
+                print-color-adjust: exact;
+                margin: 0;
+            }
+            .no-print, header, #map, #profileSidebar, #recordTableContainer, .action-buttons-group { 
+                display: none !important; 
+            }
+            .card-glass { 
+                box-shadow: none !important; 
+                border: 1px solid #eee !important; 
+                margin-top: 5px !important; 
+                margin-bottom: 5px !important;
+                padding: 10px !important;
+                border-radius: 12px !important;
+            }
+            .form-input-modern { 
+                border: none !important; 
+                padding: 2px 0 !important; 
+                font-size: 12px !important;
+            }
+            .animal-card-compact { 
+                background: transparent !important; 
+                border: 1px solid #ddd !important; 
+                padding: 2px 4px !important;
+            }
+            h3 { font-size: 10px !important; margin-bottom: 5px !important; }
+            .grid { gap: 8px !important; }
+            input[type="number"] { width: 40px !important; }
+            textarea { height: 40px !important; font-size: 11px !important; }
+            main { padding: 0 !important; }
+            #viewingBadge { display: none !important; }
         }
     </style>
 </head>
@@ -98,6 +131,7 @@
 
             <div class="flex items-center gap-2">
                 <div id="clock" class="hidden md:block text-xs font-black text-slate-500 mr-2">00:00:00</div>
+                <button onclick="window.print()" class="p-2 bg-slate-800 text-white rounded-lg text-[10px] font-bold hover:bg-black shadow-sm transition">CETAK LAPORAN</button>
                 <button onclick="clearForm()" class="p-2 bg-indigo-600 text-white rounded-lg text-[10px] font-bold hover:bg-indigo-700 shadow-sm transition">REKOD BARU</button>
                 <button onclick="toggleProfile()" class="flex items-center gap-2 bg-slate-100 p-1 rounded-full border hover:bg-white transition">
                     <img id="navAvatar" src="https://api.dicebear.com/7.x/avataaars/svg?seed=Staff" class="w-7 h-7 rounded-full bg-white">
@@ -106,9 +140,9 @@
         </div>
     </header>
 
-    <main class="max-w-screen-2xl mx-auto p-4 md:p-6 space-y-6">
+    <main class="max-w-screen-2xl mx-auto p-4 md:p-6 space-y-4">
         
-        <!-- STATUS BADGE (MOD PAPARAN) -->
+        <!-- STATUS BADGE -->
         <div id="viewingBadge" class="hidden bg-amber-50 border-2 border-amber-200 p-4 rounded-2xl flex justify-between items-center no-print animate-pulse">
             <div class="flex items-center gap-3 text-amber-800">
                 <i data-lucide="info" class="w-5 h-5"></i>
@@ -122,13 +156,13 @@
             <input type="hidden" id="record_status" name="status" value="DRAF">
 
             <!-- BAHAGIAN 1: PENTADBIRAN -->
-            <div class="card-glass p-6">
-                <div class="flex items-center gap-2 mb-6 border-b-2 border-slate-100 pb-3">
-                    <i data-lucide="file-text" class="text-indigo-600 w-5 h-5"></i>
+            <div class="card-glass p-4 md:p-6">
+                <div class="flex items-center gap-2 mb-4 border-b-2 border-slate-100 pb-2">
+                    <i data-lucide="file-text" class="text-indigo-600 w-5 h-5 no-print"></i>
                     <h3 class="font-black text-slate-900 uppercase text-xs">Maklumat Pentadbiran & Kes</h3>
                 </div>
                 
-                <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+                <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3">
                     <div><label class="input-label">Bil</label><input type="text" name="BIL" class="form-input-modern" placeholder="001"></div>
                     <div><label class="input-label">Tahun</label><input type="text" name="TAHUN" class="form-input-modern" value="2026"></div>
                     <div><label class="input-label">Bulan</label>
@@ -154,13 +188,13 @@
                 <div id="map" class="no-print"></div>
             </div>
 
-            <!-- BAHAGIAN 2: HAIWAN HIDUP (IKUT IMAGE) -->
-            <div class="card-glass p-6 mt-6 border-l-4 border-emerald-500">
-                <div class="flex items-center gap-2 mb-6">
-                    <i data-lucide="dog" class="text-emerald-600 w-5 h-5"></i>
+            <!-- BAHAGIAN 2: HAIWAN HIDUP -->
+            <div class="card-glass p-4 md:p-6 border-l-4 border-emerald-500">
+                <div class="flex items-center gap-2 mb-4">
+                    <i data-lucide="dog" class="text-emerald-600 w-5 h-5 no-print"></i>
                     <h3 class="font-black text-emerald-900 uppercase text-xs">Rampasan Haiwan Hidup (Ekor)</h3>
                 </div>
-                <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3">
+                <div class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-11 gap-2">
                     <div class="animal-card-compact"><label class="input-label">Lembu</label><input type="number" name="LEMBU" class="bg-transparent w-full font-black outline-none" value="0"></div>
                     <div class="animal-card-compact"><label class="input-label">Kerbau</label><input type="number" name="KERBAU" class="bg-transparent w-full font-black outline-none" value="0"></div>
                     <div class="animal-card-compact"><label class="input-label">Kambing</label><input type="number" name="KAMBING" class="bg-transparent w-full font-black outline-none" value="0"></div>
@@ -175,13 +209,13 @@
                 </div>
             </div>
 
-            <!-- BAHAGIAN 3: KARKAS & PRODUK (IKUT IMAGE) -->
-            <div class="card-glass p-6 mt-6 border-l-4 border-blue-500">
-                <div class="flex items-center gap-2 mb-6">
-                    <i data-lucide="package" class="text-blue-600 w-5 h-5"></i>
+            <!-- BAHAGIAN 3: KARKAS & PRODUK -->
+            <div class="card-glass p-4 md:p-6 border-l-4 border-blue-500">
+                <div class="flex items-center gap-2 mb-4">
+                    <i data-lucide="package" class="text-blue-600 w-5 h-5 no-print"></i>
                     <h3 class="font-black text-blue-900 uppercase text-xs">Karkas & Produk (Unit/KG)</h3>
                 </div>
-                <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">
+                <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2">
                     <div class="animal-card-compact"><label class="input-label">Karkas Lembu</label><input type="number" name="KARKAS LEMBU" class="bg-transparent w-full font-black outline-none" value="0"></div>
                     <div class="animal-card-compact"><label class="input-label">Karkas Kerbau</label><input type="number" name="KARKAS KERBAU" class="bg-transparent w-full font-black outline-none" value="0"></div>
                     <div class="animal-card-compact"><label class="input-label">Karkas Kambing</label><input type="number" name="KARKAS KAMBING" class="bg-transparent w-full font-black outline-none" value="0"></div>
@@ -195,45 +229,44 @@
                 </div>
             </div>
 
-            <!-- BAHAGIAN 4: LOGISTIK & NILAI (IKUT IMAGE) -->
-            <div class="card-glass p-6 mt-6 border-l-4 border-slate-500">
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+            <!-- BAHAGIAN 4: LOGISTIK & NILAI -->
+            <div class="card-glass p-4 md:p-6 border-l-4 border-slate-500">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
                     <div><label class="input-label">Jenis Rampasan</label><input type="text" name="JENIS RAMPASAN" class="form-input-modern"></div>
                     <div><label class="input-label">Rampasan Lain-Lain</label><input type="text" name="RAMPASAN LAIN-LAIN" class="form-input-modern"></div>
-                    <div><label class="input-label">Jum. Rampasan Kenderaan</label><input type="number" name="JUMLAH RAMPASAN KENDERAAN" class="form-input-modern" value="0"></div>
-                    <div><label class="input-label">Rampasan Pengangkut</label><input type="text" name="RAMPASAN PENGANGKUT" class="form-input-modern"></div>
-                    <div class="col-span-2"><label class="input-label">Kes Serahan</label><input type="text" name="KES SERAHAN" class="form-input-modern"></div>
+                    <div><label class="input-label">Jum. Kenderaan</label><input type="number" name="JUMLAH RAMPASAN KENDERAAN" class="form-input-modern" value="0"></div>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 bg-slate-100 p-4 rounded-xl border-2 border-white">
-                    <div><label class="input-label">Nilai (Ekor/KG)</label><input type="number" name="ANGGARAN NILAI (EKOR/KG)" class="calc-val form-input-modern" value="0"></div>
-                    <div><label class="input-label">Nilai (Kenderaan)</label><input type="number" name="ANGGARAN NILAI (KENDERAAN)" class="calc-val form-input-modern" value="0"></div>
-                    <div><label class="input-label">Nilai (Pengangkut/Kontena)</label><input type="number" name="ANGGARAN NILAI (PENGANGKUT/KONTENA)" class="calc-val form-input-modern" value="0"></div>
+                <div class="grid grid-cols-2 lg:grid-cols-5 gap-3 bg-slate-50 p-3 rounded-xl border border-slate-200">
+                    <div><label class="input-label">Nilai (Haiwan)</label><input type="number" name="ANGGARAN NILAI (EKOR/KG)" class="calc-val form-input-modern" value="0"></div>
+                    <div><label class="input-label">Nilai (Kereta)</label><input type="number" name="ANGGARAN NILAI (KENDERAAN)" class="calc-val form-input-modern" value="0"></div>
+                    <div><label class="input-label">Nilai (Lori/Kontena)</label><input type="number" name="ANGGARAN NILAI (PENGANGKUT/KONTENA)" class="calc-val form-input-modern" value="0"></div>
                     <div><label class="input-label">Nilai (Lain-Lain)</label><input type="number" name="ANGGARAN NILAI (LAIN-LAIN)" class="calc-val form-input-modern" value="0"></div>
-                    <div class="bg-indigo-600 p-2 rounded-lg text-white">
-                        <p class="text-[9px] font-black uppercase opacity-80">JUMLAH NILAI KESELURUHAN</p>
-                        <input type="text" name="JUMLAH NILAI KESELURUHAN" id="total_rm_field" readonly class="bg-transparent w-full text-lg font-black outline-none" value="RM 0.00">
+                    <div class="bg-indigo-600 p-2 rounded-lg text-white col-span-2 lg:col-span-1">
+                        <p class="text-[8px] font-black uppercase opacity-80">JUMLAH KESELURUHAN</p>
+                        <input type="text" name="JUMLAH NILAI KESELURUHAN" id="total_rm_field" readonly class="bg-transparent w-full text-md font-black outline-none" value="RM 0.00">
                     </div>
                 </div>
                 <div class="mt-4">
                     <label class="input-label">Catatan</label>
-                    <textarea name="CATATAN" class="form-input-modern h-20"></textarea>
+                    <textarea name="CATATAN" class="form-input-modern h-16"></textarea>
                 </div>
             </div>
 
             <!-- ACTIONS -->
-            <div class="flex flex-col md:flex-row justify-between items-center no-print py-8 gap-4">
+            <div class="flex flex-col md:flex-row justify-between items-center action-buttons-group no-print py-6 gap-4">
                 <button type="button" onclick="clearForm()" class="text-slate-400 font-bold text-xs uppercase hover:text-red-600 transition">Reset Borang</button>
                 <div class="flex flex-wrap justify-center gap-3">
                     <button id="btnDelete" type="button" onclick="deleteCurrentRecord()" class="hidden px-6 py-2 bg-red-50 text-red-600 rounded-xl font-black text-[10px] uppercase border border-red-100">Hapus</button>
                     <button type="button" onclick="saveData(false)" class="px-6 py-2 bg-slate-200 text-slate-700 rounded-xl font-black text-[10px] uppercase hover:bg-slate-300">Simpan Draf</button>
                     <button type="button" onclick="saveData(true)" class="px-8 py-2 bg-indigo-600 text-white rounded-xl font-black text-[10px] uppercase shadow-lg hover:bg-indigo-700">Hantar Laporan</button>
+                    <button type="button" onclick="window.print()" class="px-6 py-2 bg-slate-800 text-white rounded-xl font-black text-[10px] uppercase shadow-lg">Cetak PDF</button>
                 </div>
             </div>
         </form>
 
         <!-- DATA TABLE -->
-        <div class="card-glass p-6 no-print">
+        <div id="recordTableContainer" class="card-glass p-6 no-print">
             <div class="flex justify-between items-center mb-4">
                 <h3 class="font-black text-slate-900 uppercase text-[10px] tracking-widest">Pangkalan Data Rekod</h3>
                 <button onclick="exportToExcel()" class="bg-emerald-600 text-white px-3 py-1 rounded-lg text-[10px] font-bold flex items-center gap-1"><i data-lucide="file-spreadsheet" class="w-3 h-3"></i> EXCEL</button>
@@ -255,31 +288,31 @@
         </div>
     </main>
 
-    <!-- PROFILE SIDEBAR (RESPONSIVE) -->
-    <aside id="profileSidebar" class="fixed top-0 h-full bg-white shadow-2xl z-50 p-6 no-print border-l">
+    <!-- PROFILE SIDEBAR (RESPONSIVE FIXED) -->
+    <aside id="profileSidebar" class="fixed top-0 h-full bg-white shadow-2xl z-50 p-6 no-print border-l overflow-y-auto">
         <div class="flex justify-between items-center mb-8">
             <h2 class="font-black text-slate-900 uppercase text-xs">Tetapan Pegawai</h2>
             <button onclick="toggleProfile()" class="p-2 hover:bg-slate-100 rounded-full"><i data-lucide="x" class="w-5 h-5"></i></button>
         </div>
         <div class="space-y-5">
             <div class="text-center mb-6">
-                <div class="relative w-20 h-20 mx-auto">
-                    <img id="sideAvatar" src="https://api.dicebear.com/7.x/avataaars/svg?seed=Staff" class="w-20 h-20 rounded-2xl mx-auto bg-slate-50 border shadow-sm object-cover">
-                    <label for="photoUpload" class="absolute bottom-0 right-0 bg-indigo-600 text-white p-1.5 rounded-full cursor-pointer"><i data-lucide="camera" class="w-3 h-3"></i></label>
+                <div class="relative w-24 h-24 mx-auto">
+                    <img id="sideAvatar" src="https://api.dicebear.com/7.x/avataaars/svg?seed=Staff" class="w-24 h-24 rounded-2xl mx-auto bg-slate-50 border shadow-sm object-cover">
+                    <label for="photoUpload" class="absolute bottom-[-10px] right-[-10px] bg-indigo-600 text-white p-2 rounded-full cursor-pointer shadow-lg"><i data-lucide="camera" class="w-4 h-4"></i></label>
                     <input type="file" id="photoUpload" class="hidden" accept="image/*" onchange="previewPhoto(event)">
                 </div>
             </div>
             <div>
                 <label class="input-label">Nama Penuh</label>
-                <input type="text" id="userName" oninput="updateProfile()" class="form-input-modern" placeholder="Cth: Ahmad bin Ali">
+                <input type="text" id="userName" class="form-input-modern" placeholder="Cth: Ahmad bin Ali">
             </div>
             <div>
                 <label class="input-label">Gred / Jawatan</label>
-                <input type="text" id="userGred" oninput="updateProfile()" class="form-input-modern" placeholder="Cth: KP22">
+                <input type="text" id="userGred" class="form-input-modern" placeholder="Cth: KP22">
             </div>
             <div>
-                <label class="input-label">Negeri / Cawangan (Boleh taip sendiri)</label>
-                <input type="text" id="userCawangan" list="cawangan-list" oninput="updateProfile()" class="form-input-modern" placeholder="Cth: JPV PERAK / Unit Siasatan">
+                <label class="input-label">Negeri / Cawangan</label>
+                <input type="text" id="userCawangan" list="cawangan-list" class="form-input-modern" placeholder="Cth: JPV PERAK">
                 <datalist id="cawangan-list">
                     <option value="IBU PEJABAT">
                     <option value="JPV PERLIS"><option value="JPV KEDAH"><option value="JPV PULAU PINANG">
@@ -288,8 +321,11 @@
                     <option value="JPV TERENGGANU"><option value="JPV KELANTAN"><option value="JPV SABAH"><option value="JPV SARAWAK">
                 </datalist>
             </div>
-            <div class="bg-blue-50 p-4 rounded-xl border border-blue-100 mt-10">
-                <p class="text-[10px] text-blue-700 font-bold leading-relaxed">Info: Nama dan Cawangan ini akan automatik dimasukkan ke dalam setiap borang baru yang anda buka.</p>
+            
+            <button onclick="saveProfileData()" class="w-full bg-indigo-600 text-white font-black py-3 rounded-xl text-xs uppercase tracking-widest hover:bg-indigo-700 transition shadow-lg mt-4">SIMPAN PROFIL</button>
+
+            <div class="bg-blue-50 p-4 rounded-xl border border-blue-100 mt-6">
+                <p class="text-[10px] text-blue-700 font-bold leading-relaxed">Maklumat ini akan dipaparkan secara automatik dalam setiap laporan baru anda.</p>
             </div>
         </div>
     </aside>
@@ -316,12 +352,11 @@
             reader.onload = () => {
                 document.getElementById('sideAvatar').src = reader.result;
                 document.getElementById('navAvatar').src = reader.result;
-                updateProfile();
             };
             reader.readAsDataURL(event.target.files[0]);
         }
 
-        function updateProfile() {
+        function saveProfileData() {
             const data = {
                 name: document.getElementById('userName').value,
                 gred: document.getElementById('userGred').value,
@@ -330,6 +365,8 @@
             };
             localStorage.setItem('bpk_profile_v31', JSON.stringify(data));
             document.getElementById('caseOfficer').value = `${data.name} (${data.cawangan})`.toUpperCase();
+            alert('Profil dikemaskini!');
+            toggleProfile();
         }
 
         function loadProfile() {
@@ -377,6 +414,7 @@
             localStorage.setItem('bpk_db_v31', JSON.stringify(db));
             alert(isSubmit ? 'Laporan berjaya DIHANTAR!' : 'Draf disimpan.');
             renderTable();
+            if(isSubmit) window.print();
             clearForm();
         }
 
@@ -404,7 +442,6 @@
             if (!r) return;
             
             const form = document.getElementById('mainForm');
-            // Reset & Fill
             form.reset();
             Object.keys(r).forEach(key => {
                 const input = form.querySelector(`[name="${key}"]`);
