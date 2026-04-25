@@ -3,13 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>e-Penguatkuasa v36 | Dashboard Korporat BPK</title>
+    <title>e-Penguatkuasa v37.0 | Dashboard Korporat BPK</title>
     
     <link rel="icon" type="image/png" href="https://github.com/ttv4u1/KP/raw/main/Logo%20Penguatkuasa.png">
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     
     <!-- Firebase SDK -->
@@ -26,7 +25,6 @@
             background: #0f172a;
         }
 
-        /* FULLSCREEN BACKGROUND THEME */
         .master-bg {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -38,7 +36,6 @@
             z-index: -1;
         }
 
-        /* LANDING PAGE OVERLAY */
         #landing-screen {
             position: fixed;
             inset: 0;
@@ -65,14 +62,9 @@
             padding: 3.5rem;
             width: 100%;
             max-width: 550px;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
         }
 
-        /* DASHBOARD CONTENT */
-        #app-content {
-            opacity: 0;
-            transition: opacity 1s ease;
-        }
+        #app-content { opacity: 0; transition: opacity 1s ease; }
         #app-content.visible { opacity: 1; }
 
         .form-input-modern {
@@ -95,11 +87,11 @@
 
         label.input-label {
             display: block;
-            font-size: 14px;
+            font-size: 13px;
             font-weight: 800;
             color: #334155;
             text-transform: uppercase;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
             letter-spacing: 0.05em;
         }
 
@@ -118,8 +110,6 @@
             padding: 12px 15px;
         }
 
-        #map { height: 400px; border-radius: 28px; border: 4px solid #fff; box-shadow: 0 10px 15px rgba(0,0,0,0.1); }
-
         @media (max-width: 768px) {
             .section-card { padding: 1.5rem; }
             :root { --p-size: 16px; }
@@ -137,55 +127,49 @@
 
     <div class="master-bg"></div>
 
-    <!-- LANDING SCREEN (GATE) -->
+    <!-- LANDING SCREEN -->
     <section id="landing-screen">
         <div class="glass-card text-center mx-4">
             <div class="flex justify-center gap-4 mb-10">
                 <img src="https://www.akm.gov.my/images/madani/JATA%20NEGARA%20AI-01.png" class="h-24 md:h-28 object-contain">
                 <img src="https://github.com/ttv4u1/KP/raw/main/Logo%20Penguatkuasa.png" class="h-24 md:h-28 object-contain">
             </div>
-            
             <h1 class="text-3xl md:text-5xl font-black text-white mb-3 tracking-tighter uppercase">e-Penguatkuasa</h1>
-            <p class="text-indigo-300 font-bold mb-10 uppercase tracking-[0.2em] text-sm">Jabatan Perkhidmatan Veterinar Malaysia</p>
-            
+            <p class="text-indigo-300 font-bold mb-10 uppercase tracking-[0.2em] text-sm">Versi 37.0 - Sistem Pengurusan Kes</p>
             <button onclick="loginGoogle()" class="group w-full flex items-center justify-center gap-4 bg-white text-slate-900 font-black py-6 rounded-3xl transition-all hover:bg-indigo-50 active:scale-95 shadow-2xl">
                 <img src="https://www.google.com/favicon.ico" class="w-6 h-6">
                 LOG MASUK DENGAN GOOGLE
             </button>
-            
-            <div class="mt-10 pt-6 border-t border-white/10">
-                <p class="text-white/40 text-[10px] font-bold uppercase tracking-widest">Sistem Pengurusan Kes Versi 36.0 (2026)</p>
-            </div>
         </div>
     </section>
 
-    <!-- MAIN APP CONTENT -->
+    <!-- MAIN APP -->
     <div id="app-content" class="hidden min-h-screen pb-20">
-        
         <header class="sticky top-0 z-40 bg-white/90 backdrop-blur-xl border-b border-gray-200 no-print">
             <div class="max-w-screen-2xl mx-auto px-6 py-4 flex justify-between items-center">
                 <div class="flex items-center gap-4">
                     <img src="https://github.com/ttv4u1/KP/raw/main/Logo%20Penguatkuasa.png" class="h-14">
                     <div>
                         <h2 class="text-xl font-black text-slate-800 tracking-tighter leading-none">BPK DASHBOARD</h2>
-                        <span class="text-xs font-bold text-indigo-600 uppercase">Akses Pegawai: <span id="access-name">...</span></span>
+                        <span class="text-xs font-bold text-indigo-600 uppercase">Pegawai: <span id="access-name">...</span></span>
                     </div>
                 </div>
                 <div class="flex items-center gap-4">
                     <div id="clock" class="hidden md:block font-black text-slate-400 text-lg mr-4">00:00:00</div>
-                    <button onclick="window.print()" class="px-6 py-3 bg-slate-900 text-white rounded-2xl text-xs font-black uppercase hover:bg-black transition shadow-lg">Cetak</button>
-                    <button onclick="logout()" class="px-6 py-3 bg-red-50 text-red-600 rounded-2xl text-xs font-black uppercase hover:bg-red-600 hover:text-white transition">Keluar</button>
-                    <img id="navAvatar" onclick="toggleProfile()" src="" class="w-12 h-12 rounded-2xl border-2 border-indigo-100 cursor-pointer hover:scale-105 transition">
+                    <button onclick="toggleProfile()" class="flex items-center gap-3 bg-slate-100 p-1 pr-4 rounded-2xl hover:bg-slate-200 transition">
+                        <img id="navAvatar" src="https://via.placeholder.com/150" class="w-10 h-10 rounded-xl object-cover border-2 border-white shadow-sm">
+                        <span class="text-xs font-black text-slate-700 uppercase">Profil</span>
+                    </button>
+                    <button onclick="logout()" class="p-3 bg-red-50 text-red-600 rounded-xl hover:bg-red-600 hover:text-white transition"><i data-lucide="log-out"></i></button>
                 </div>
             </div>
         </header>
 
         <main class="max-w-screen-2xl mx-auto p-4 md:p-8 space-y-8">
-            
             <form id="mainForm">
                 <input type="hidden" id="current_record_id" name="id">
 
-                <!-- 1. MAKLUMAT KES (HEADERS DARI IMEJ) -->
+                <!-- 1. MAKLUMAT PENTADBIRAN -->
                 <div class="section-card">
                     <div class="flex items-center gap-4 mb-10 pb-4 border-b-2 border-slate-100">
                         <div class="p-3 bg-indigo-600 text-white rounded-2xl"><i data-lucide="file-text"></i></div>
@@ -211,8 +195,13 @@
                         <div><label class="input-label">Tarikh Kejadian</label><input type="date" name="TARIKH KEJADIAN" class="form-input-modern"></div>
                         <div><label class="input-label">Masa Kejadian</label><input type="time" name="MASA KEJADIAN" class="form-input-modern"></div>
                         
-                        <div class="md:col-span-4"><label class="input-label">Lokasi Kejadian</label><input type="text" id="lokasi_kejadian" name="LOKASI KEJADIAN" class="form-input-modern" placeholder="Koordinat atau Alamat"></div>
-                        <div class="md:col-span-4 no-print"><div id="map"></div></div>
+                        <div class="md:col-span-4">
+                            <label class="input-label">Lokasi Kejadian (Alamat / Koordinat)</label>
+                            <div class="flex gap-2">
+                                <input type="text" id="lokasi_kejadian" name="LOKASI KEJADIAN" class="form-input-modern" placeholder="Masukkan lokasi...">
+                                <button type="button" onclick="openGMap()" class="bg-slate-900 text-white px-6 rounded-2xl font-black text-xs hover:bg-indigo-600 transition">GOOGLE&nbsp;MAPS</button>
+                            </div>
+                        </div>
 
                         <div class="md:col-span-2"><label class="input-label">Kesalahan</label><input type="text" name="KESALAHAN" class="form-input-modern"></div>
                         <div class="md:col-span-2"><label class="input-label">Undang-Undang / Peruntukan</label><input type="text" name="UNDANG-UNDANG" class="form-input-modern"></div>
@@ -265,35 +254,36 @@
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-5 gap-4 bg-slate-900 p-8 rounded-[32px] text-white">
-                        <div class="md:col-span-1"><label class="input-label text-indigo-300">Nilai (Ekor/KG)</label><input type="number" name="ANGGARAN NILAI (EKOR/KG)" class="calc-val bg-white/10 w-full p-4 rounded-xl font-bold outline-none" value="0"></div>
-                        <div class="md:col-span-1"><label class="input-label text-indigo-300">Nilai (Kereta)</label><input type="number" name="ANGGARAN NILAI (KENDERAAN)" class="calc-val bg-white/10 w-full p-4 rounded-xl font-bold outline-none" value="0"></div>
-                        <div class="md:col-span-1"><label class="input-label text-indigo-300">Nilai (Lori/Kontena)</label><input type="number" name="ANGGARAN NILAI (PENGANGKUT/KONTENA)" class="calc-val bg-white/10 w-full p-4 rounded-xl font-bold outline-none" value="0"></div>
-                        <div class="md:col-span-1"><label class="input-label text-indigo-300">Nilai (Lain-Lain)</label><input type="number" name="ANGGARAN NILAI (LAIN-LAIN)" class="calc-val bg-white/10 w-full p-4 rounded-xl font-bold outline-none" value="0"></div>
-                        <div class="md:col-span-1 bg-indigo-600 p-4 rounded-2xl flex flex-col justify-center">
+                        <div><label class="input-label text-indigo-300">Nilai (Ekor/KG)</label><input type="number" name="ANGGARAN NILAI (EKOR/KG)" class="calc-val bg-white/10 w-full p-4 rounded-xl font-bold outline-none" value="0"></div>
+                        <div><label class="input-label text-indigo-300">Nilai (Kereta)</label><input type="number" name="ANGGARAN NILAI (KENDERAAN)" class="calc-val bg-white/10 w-full p-4 rounded-xl font-bold outline-none" value="0"></div>
+                        <div><label class="input-label text-indigo-300">Nilai (Lori/Kontena)</label><input type="number" name="ANGGARAN NILAI (PENGANGKUT/KONTENA)" class="calc-val bg-white/10 w-full p-4 rounded-xl font-bold outline-none" value="0"></div>
+                        <div><label class="input-label text-indigo-300">Nilai (Lain-Lain)</label><input type="number" name="ANGGARAN NILAI (LAIN-LAIN)" class="calc-val bg-white/10 w-full p-4 rounded-xl font-bold outline-none" value="0"></div>
+                        <div class="bg-indigo-600 p-4 rounded-2xl flex flex-col justify-center">
                             <p class="text-[10px] font-black opacity-70">JUMLAH KESELURUHAN</p>
-                            <input type="text" name="JUMLAH NILAI KESELURUHAN" id="total_rm_field" readonly class="bg-transparent w-full text-2xl font-black outline-none" value="RM 0.00">
+                            <input type="text" name="JUMLAH NILAI KESELURUHAN" id="total_rm_field" readonly class="bg-transparent w-full text-xl font-black outline-none" value="RM 0.00">
                         </div>
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
-                        <div><label class="input-label">Kes Serahan</label><input type="text" name="KES SERAHAN" class="form-input-modern" placeholder="Cth: JPV PERLIS"></div>
+                        <div><label class="input-label">Kes Serahan</label><input type="text" name="KES SERAHAN" class="form-input-modern" placeholder="Contoh: JPV PERLIS"></div>
                         <div><label class="input-label">Catatan</label><input type="text" name="CATATAN" class="form-input-modern"></div>
                     </div>
                 </div>
 
-                <!-- BUTANG AKSI -->
                 <div class="flex flex-wrap justify-end gap-6 py-12 no-print">
                     <button type="button" onclick="clearForm()" class="px-8 py-4 text-slate-400 font-bold uppercase hover:text-red-500 transition">Reset Borang</button>
-                    <button type="button" onclick="saveData(false)" class="px-10 py-5 bg-slate-200 text-slate-700 rounded-3xl font-black uppercase shadow-md">Simpan Draf</button>
+                    <button type="button" onclick="saveData(false)" class="px-10 py-5 bg-slate-200 text-slate-700 rounded-3xl font-black uppercase">Simpan Draf</button>
                     <button type="button" onclick="saveData(true)" class="px-12 py-5 bg-indigo-600 text-white rounded-3xl font-black uppercase shadow-2xl hover:scale-105 transition transform">Hantar Laporan</button>
                 </div>
             </form>
 
-            <!-- JADUAL REKOD -->
+            <!-- ARCHIVE -->
             <div id="recordTableContainer" class="section-card no-print">
-                <div class="flex justify-between items-center mb-8">
+                <div class="flex flex-col md:flex-row justify-between items-center gap-4 mb-8">
                     <h3 class="font-black text-slate-900 uppercase text-xl">Arkib Kes</h3>
-                    <button onclick="exportToExcel()" class="flex items-center gap-2 bg-emerald-600 text-white px-6 py-3 rounded-2xl font-black text-sm"><i data-lucide="download"></i> EXCEL</button>
+                    <button onclick="exportToExcel()" class="w-full md:w-auto flex items-center justify-center gap-2 bg-emerald-600 text-white px-6 py-3 rounded-2xl font-black text-sm hover:bg-emerald-700 transition">
+                        <i data-lucide="download"></i> EXPORT KE EXCEL
+                    </button>
                 </div>
                 <div class="overflow-x-auto">
                     <table class="w-full text-left">
@@ -312,24 +302,37 @@
         </main>
     </div>
 
-    <!-- PROFILE SIDEBAR -->
-    <aside id="profileSidebar" class="fixed top-0 right-[-100%] w-full max-w-[400px] h-full bg-white z-[1001] shadow-2xl transition-all duration-500 p-8">
-        <div class="flex justify-between items-center mb-10">
-            <h2 class="font-black text-slate-900 uppercase">Tetapan Pegawai</h2>
-            <button onclick="toggleProfile()" class="p-2 bg-slate-100 rounded-full"><i data-lucide="x"></i></button>
-        </div>
-        <div class="space-y-6">
-            <img id="sideAvatar" src="" class="w-32 h-32 rounded-3xl mx-auto shadow-xl border-4 border-indigo-50">
-            <div><label class="input-label">Nama Penuh</label><input type="text" id="userName" class="form-input-modern"></div>
-            <div><label class="input-label">Gred / Jawatan</label><input type="text" id="userGred" class="form-input-modern"></div>
-            <div><label class="input-label">Cawangan</label><input type="text" id="userCawangan" class="form-input-modern"></div>
-            <button onclick="saveProfileData()" class="w-full bg-indigo-600 text-white font-black py-5 rounded-2xl shadow-xl">SIMPAN PROFIL</button>
+    <!-- PROFILE SIDEBAR (IMPROVED RESPONSIVE) -->
+    <aside id="profileSidebar" class="fixed top-0 right-[-100%] w-full max-w-[450px] h-full bg-white z-[1001] shadow-2xl transition-all duration-500 overflow-y-auto">
+        <div class="p-8">
+            <div class="flex justify-between items-center mb-10">
+                <h2 class="font-black text-slate-900 uppercase text-xl">Tetapan Profil</h2>
+                <button onclick="toggleProfile()" class="p-2 bg-slate-100 rounded-full hover:bg-red-50 hover:text-red-600 transition"><i data-lucide="x"></i></button>
+            </div>
+
+            <div class="space-y-8">
+                <div class="relative group w-40 h-40 mx-auto">
+                    <img id="sideAvatar" src="https://via.placeholder.com/150" class="w-full h-full rounded-[40px] object-cover shadow-2xl border-4 border-indigo-50">
+                    <button onclick="document.getElementById('avatarUpload').click()" class="absolute bottom-[-10px] right-[-10px] bg-indigo-600 text-white p-4 rounded-2xl shadow-xl hover:scale-110 transition">
+                        <i data-lucide="camera" class="w-5 h-5"></i>
+                    </button>
+                    <input type="file" id="avatarUpload" class="hidden" accept="image/*" onchange="previewAvatar(event)">
+                </div>
+
+                <div class="space-y-4">
+                    <div><label class="input-label">Nama Penuh</label><input type="text" id="userName" class="form-input-modern" placeholder="Nama anda"></div>
+                    <div><label class="input-label">Gred / Jawatan</label><input type="text" id="userGred" class="form-input-modern" placeholder="Cth: G41"></div>
+                    <div><label class="input-label">Cawangan / Negeri</label><input type="text" id="userCawangan" class="form-input-modern" placeholder="Cth: JPV PERAK"></div>
+                </div>
+
+                <button onclick="saveProfileData()" class="w-full bg-slate-900 text-white font-black py-5 rounded-3xl shadow-xl hover:bg-indigo-600 transition">SIMPAN PERUBAHAN</button>
+                <p class="text-center text-[10px] text-slate-400 font-bold uppercase tracking-widest">Data profil disimpan secara lokal pada peranti ini</p>
+            </div>
         </div>
     </aside>
 
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
-        // FIREBASE CONFIG (Gantikan dengan milik anda)
+        // CONFIG
         const firebaseConfig = {
             apiKey: "AIzaSyD5rx8TQdkFLzmunEmVtwt56Y8Mlt9Zsvo",
             authDomain: "e-penguatkuasa-jpv.firebaseapp.com",
@@ -339,19 +342,18 @@
             appId: "1:790915728070:web:d2759cc670024001218dc7"
         };
         firebase.initializeApp(firebaseConfig);
-
         lucide.createIcons();
 
-        // LOGIC LOGIN & PERSISTENCE
+        // AUTH
         function loginGoogle() {
             const provider = new firebase.auth.GoogleAuthProvider();
             firebase.auth().signInWithPopup(provider);
         }
 
         function logout() {
-            firebase.auth().signOut().then(() => {
-                location.reload();
-            });
+            if(confirm('Log keluar sistem?')) {
+                firebase.auth().signOut().then(() => location.reload());
+            }
         }
 
         firebase.auth().onAuthStateChanged(user => {
@@ -359,26 +361,71 @@
                 document.getElementById('landing-screen').classList.add('hidden');
                 document.getElementById('app-content').classList.remove('hidden');
                 setTimeout(() => document.getElementById('app-content').classList.add('visible'), 100);
-                
-                document.getElementById('navAvatar').src = user.photoURL;
-                document.getElementById('sideAvatar').src = user.photoURL;
                 document.getElementById('access-name').innerText = user.displayName;
                 loadProfile();
-            } else {
-                document.getElementById('landing-screen').classList.remove('hidden');
-                document.getElementById('app-content').classList.add('hidden');
             }
         });
 
-        // MAPS
-        const map = L.map('map').setView([4.2105, 101.9758], 6);
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
-        let marker;
-        map.on('click', e => {
-            if (marker) map.removeLayer(marker);
-            marker = L.marker(e.latlng).addTo(map);
-            document.getElementById('lokasi_kejadian').value = `${e.latlng.lat.toFixed(6)}, ${e.latlng.lng.toFixed(6)}`;
-        });
+        // PROFILE & AVATAR LOGIC
+        function toggleProfile() { 
+            const side = document.getElementById('profileSidebar');
+            side.style.right = (side.style.right === '0px') ? '-100%' : '0px';
+        }
+
+        function previewAvatar(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('sideAvatar').src = e.target.result;
+                    document.getElementById('navAvatar').src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function saveProfileData() {
+            const data = {
+                name: document.getElementById('userName').value,
+                gred: document.getElementById('userGred').value,
+                cawangan: document.getElementById('userCawangan').value,
+                avatar: document.getElementById('sideAvatar').src
+            };
+            localStorage.setItem('bpk_profile_v37', JSON.stringify(data));
+            updateOfficerField(data);
+            alert('Profil Berjaya Dikemaskini!');
+            toggleProfile();
+        }
+
+        function loadProfile() {
+            const saved = localStorage.getItem('bpk_profile_v37');
+            const user = firebase.auth().currentUser;
+            if (saved) {
+                const data = JSON.parse(saved);
+                document.getElementById('userName').value = data.name || user.displayName;
+                document.getElementById('userGred').value = data.gred || "";
+                document.getElementById('userCawangan').value = data.cawangan || "";
+                if(data.avatar) {
+                    document.getElementById('sideAvatar').src = data.avatar;
+                    document.getElementById('navAvatar').src = data.avatar;
+                }
+                updateOfficerField(data);
+            } else {
+                document.getElementById('userName').value = user.displayName;
+                document.getElementById('navAvatar').src = user.photoURL;
+                document.getElementById('sideAvatar').src = user.photoURL;
+                updateOfficerField({name: user.displayName, cawangan: 'BPK'});
+            }
+        }
+
+        function updateOfficerField(data) {
+            document.getElementById('caseOfficer').value = `${data.name} (${data.cawangan || 'BPK'})`.toUpperCase();
+        }
+
+        // GOOGLE MAPS HELPER
+        function openGMap() {
+            window.open('https://www.google.com/maps', '_blank');
+        }
 
         // CALCULATIONS
         function calcTotalRM() {
@@ -388,41 +435,8 @@
         }
         document.querySelectorAll('.calc-val').forEach(i => i.addEventListener('input', calcTotalRM));
 
-        // PROFILE
-        function toggleProfile() { 
-            const side = document.getElementById('profileSidebar');
-            side.style.right = side.style.right === '0px' ? '-100%' : '0px';
-        }
-
-        function saveProfileData() {
-            const data = {
-                name: document.getElementById('userName').value,
-                gred: document.getElementById('userGred').value,
-                cawangan: document.getElementById('userCawangan').value
-            };
-            localStorage.setItem('bpk_profile_v36', JSON.stringify(data));
-            document.getElementById('caseOfficer').value = `${data.name} (${data.cawangan})`.toUpperCase();
-            alert('Profil Dikemaskini!');
-            toggleProfile();
-        }
-
-        function loadProfile() {
-            const saved = localStorage.getItem('bpk_profile_v36');
-            const user = firebase.auth().currentUser;
-            if (saved) {
-                const data = JSON.parse(saved);
-                document.getElementById('userName').value = data.name || user.displayName;
-                document.getElementById('userGred').value = data.gred || "";
-                document.getElementById('userCawangan').value = data.cawangan || "";
-                document.getElementById('caseOfficer').value = `${data.name || user.displayName} (${data.cawangan || 'BPK'})`.toUpperCase();
-            } else {
-                document.getElementById('userName').value = user.displayName;
-                document.getElementById('caseOfficer').value = user.displayName.toUpperCase();
-            }
-        }
-
-        // DATABASE (Local Simulation v36)
-        let db = JSON.parse(localStorage.getItem('bpk_db_v36')) || [];
+        // DATABASE SIMULATION
+        let db = JSON.parse(localStorage.getItem('bpk_db_v37')) || [];
 
         function saveData(isSubmit) {
             const form = document.getElementById('mainForm');
@@ -439,7 +453,7 @@
                 db.push(data);
             }
 
-            localStorage.setItem('bpk_db_v36', JSON.stringify(db));
+            localStorage.setItem('bpk_db_v37', JSON.stringify(db));
             alert(isSubmit ? 'Laporan Rasmi Berjaya Dihantar!' : 'Draf Kes Disimpan.');
             renderTable();
             if(isSubmit) clearForm();
@@ -449,9 +463,12 @@
             const tbody = document.getElementById('recordTable');
             tbody.innerHTML = db.slice().reverse().map(r => `
                 <tr class="hover:bg-slate-50 transition">
-                    <td class="p-4 font-bold text-slate-700">${r.BIL || '-'}/${r.TAHUN} <span class="block text-[10px] text-indigo-500">${r.status}</span></td>
-                    <td class="p-4 text-sm text-slate-600">${r.KESALAHAN || 'N/A'}</td>
-                    <td class="p-4 text-right font-black text-slate-900">${r['JUMLAH NILAI KESELURUHAN']}</td>
+                    <td class="p-4 font-bold text-slate-700 text-sm">
+                        ${r.BIL || '-'}/${r.TAHUN} 
+                        <span class="block text-[9px] ${r.status === 'DIHANTAR' ? 'text-emerald-500' : 'text-amber-500'} font-black">${r.status}</span>
+                    </td>
+                    <td class="p-4 text-xs text-slate-600 font-semibold">${r.KESALAHAN || 'TIADA MAKLUMAT'}</td>
+                    <td class="p-4 text-right font-black text-slate-900 text-sm">${r['JUMLAH NILAI KESELURUHAN']}</td>
                     <td class="p-4 flex justify-center gap-2">
                         <button onclick="viewRecord(${r.id})" class="p-2 bg-indigo-50 text-indigo-600 rounded-lg"><i data-lucide="eye" class="w-4 h-4"></i></button>
                         <button onclick="deleteRecord(${r.id})" class="p-2 bg-red-50 text-red-600 rounded-lg"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
@@ -475,9 +492,9 @@
         }
 
         function deleteRecord(id) {
-            if(confirm('Hapus rekod ini?')) {
+            if(confirm('Hapus rekod ini secara kekal?')) {
                 db = db.filter(x => x.id !== id);
-                localStorage.setItem('bpk_db_v36', JSON.stringify(db));
+                localStorage.setItem('bpk_db_v37', JSON.stringify(db));
                 renderTable();
             }
         }
@@ -490,10 +507,11 @@
         }
 
         function exportToExcel() {
+            if(db.length === 0) return alert('Tiada data untuk dieksport');
             const worksheet = XLSX.utils.json_to_sheet(db);
             const workbook = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(workbook, worksheet, "KES_BPK");
-            XLSX.writeFile(workbook, `BPK_LAPORAN_v36_${new Date().getTime()}.xlsx`);
+            XLSX.utils.book_append_sheet(workbook, worksheet, "KES_BPK_V37");
+            XLSX.writeFile(workbook, `LAPORAN_BPK_v37_${new Date().getTime()}.xlsx`);
         }
 
         setInterval(() => {
