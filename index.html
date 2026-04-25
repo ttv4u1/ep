@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>e-Penguatkuasa v8.0 | BPK Dashboard</title>
+    <title>e-Penguatkuasa v9.0 | BPK Dashboard</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
@@ -18,14 +18,14 @@
             background-position: center;
             background-repeat: no-repeat;
             background-size: 600px;
-            font-size: 16px; /* Increased base font size for TikTok style */
+            font-size: 16px;
         }
 
         .card-glass {
             background: rgba(255, 255, 255, 0.92);
             backdrop-filter: blur(15px);
             border: 1px solid rgba(255, 255, 255, 0.8);
-            border-radius: 28px; /* Slightly rounder */
+            border-radius: 28px;
             box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
         }
 
@@ -38,12 +38,12 @@
 
         .form-input-modern {
             width: 100%;
-            padding: 12px 16px; /* Larger padding */
+            padding: 12px 16px;
             border-radius: 14px;
-            border: 2px solid #e2e8f0; /* Thicker border */
+            border: 2px solid #e2e8f0;
             background: #ffffff;
-            font-weight: 700; /* Bolder text like TikTok */
-            font-size: 1rem; /* Standard 16px for inputs */
+            font-weight: 700;
+            font-size: 1rem;
             transition: all 0.2s;
             color: #1e293b;
         }
@@ -82,7 +82,6 @@
             object-fit: contain;
         }
 
-        /* TikTok-style bold labels */
         label.input-label {
             display: block;
             font-size: 12px;
@@ -96,15 +95,48 @@
         .btn-primary {
             transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
-        .btn-primary:hover {
-            transform: scale(1.02);
-        }
 
+        /* --- PRINT SETTINGS --- */
         @media print {
-            @page { size: A4; margin: 0.5cm; }
-            .no-print { display: none !important; }
-            .card-glass { border: 1px solid #e2e8f0 !important; box-shadow: none !important; margin-bottom: 5px !important; padding: 15px !important; }
-            .grid { display: grid !important; grid-template-columns: repeat(4, 1fr) !important; gap: 10px !important; }
+            body { 
+                background: white !important; 
+                padding: 0 !important;
+                margin: 0 !important;
+            }
+            header, footer, .no-print, #map, button, #profileSidebar, #recordTable_wrapper, .btn-primary {
+                display: none !important;
+            }
+            .card-glass {
+                border: 1px solid #eee !important;
+                box-shadow: none !important;
+                background: white !important;
+                margin-bottom: 20px !important;
+                break-inside: avoid;
+                border-radius: 12px !important;
+                padding: 20px !important;
+            }
+            .form-input-modern {
+                border: none !important;
+                padding: 0 !important;
+                background: transparent !important;
+                font-size: 14px !important;
+            }
+            input[type="number"]::-webkit-inner-spin-button,
+            input[type="number"]::-webkit-outer-spin-button {
+                -webkit-appearance: none;
+                margin: 0;
+            }
+            .section-header {
+                border-bottom: 1px solid #000 !important;
+            }
+            .grid {
+                display: grid !important;
+                gap: 10px !important;
+            }
+            /* Hide empty inputs in print to keep it clean */
+            input:placeholder-shown {
+                display: none;
+            }
         }
     </style>
 </head>
@@ -122,7 +154,7 @@
                     <p class="text-sm font-black text-slate-800 leading-none uppercase tracking-tighter">JPV MALAYSIA</p>
                     <p class="text-[11px] font-extrabold text-blue-600 uppercase tracking-widest mt-1">Bahagian Penguatkuasa (BPK)</p>
                 </div>
-                <div class="bg-blue-600 text-white text-[11px] px-3 py-1 rounded-full font-black ml-2 shadow-blue-200 shadow-lg">v8.0</div>
+                <div class="bg-blue-600 text-white text-[11px] px-3 py-1 rounded-full font-black ml-2 shadow-blue-200 shadow-lg">v9.0</div>
             </div>
 
             <div class="flex items-center gap-5">
@@ -228,144 +260,156 @@
 
             <!-- SECTION B: HAIWAN HIDUP -->
             <div class="card-glass p-10">
-                <div class="section-header border-emerald-100">
-                    <img src="https://cdn-icons-png.flaticon.com/512/1998/1998664.png" class="w-12 h-12" alt="Animal">
-                    <h3 class="font-black text-emerald-900 uppercase text-base tracking-widest">B. Rampasan Haiwan Hidup (Ekor)</h3>
+                <div class="section-header border-emerald-100 flex justify-between items-center">
+                    <div class="flex items-center gap-4">
+                        <img src="https://cdn-icons-png.flaticon.com/512/1998/1998664.png" class="w-12 h-12" alt="Animal">
+                        <h3 class="font-black text-emerald-900 uppercase text-base tracking-widest">B. Rampasan Haiwan Hidup (Ekor)</h3>
+                    </div>
+                    <div class="bg-emerald-100 px-4 py-2 rounded-xl border-2 border-emerald-200">
+                        <span class="text-[10px] font-black text-emerald-600 uppercase block leading-none">Jumlah Ekor</span>
+                        <span id="total_h" class="text-xl font-black text-emerald-800">0</span>
+                    </div>
                 </div>
                 <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-11 gap-4">
                     <div class="animal-card border-b-[6px] border-orange-400">
                         <img src="https://cdn-icons-png.flaticon.com/512/1998/1998671.png" class="w-10 mx-auto mb-3">
                         <label class="text-[10px] font-black uppercase text-slate-400 block mb-2 tracking-tighter">Lembu</label>
-                        <input type="number" name="h_lembu" class="w-full text-center font-black outline-none text-lg text-slate-800" value="0">
+                        <input type="number" name="h_lembu" class="calc-h w-full text-center font-black outline-none text-lg text-slate-800" value="0">
                     </div>
                     <div class="animal-card border-b-[6px] border-slate-500">
                         <img src="https://cdn-icons-png.flaticon.com/512/2395/2395796.png" class="w-10 mx-auto mb-3">
                         <label class="text-[10px] font-black uppercase text-slate-400 block mb-2 tracking-tighter">Kerbau</label>
-                        <input type="number" name="h_kerbau" class="w-full text-center font-black outline-none text-lg text-slate-800" value="0">
+                        <input type="number" name="h_kerbau" class="calc-h w-full text-center font-black outline-none text-lg text-slate-800" value="0">
                     </div>
                     <div class="animal-card border-b-[6px] border-amber-500">
                         <img src="https://cdn-icons-png.flaticon.com/512/1998/1998675.png" class="w-10 mx-auto mb-3">
                         <label class="text-[10px] font-black uppercase text-slate-400 block mb-2 tracking-tighter">Kambing</label>
-                        <input type="number" name="h_kambing" class="w-full text-center font-black outline-none text-lg text-slate-800" value="0">
+                        <input type="number" name="h_kambing" class="calc-h w-full text-center font-black outline-none text-lg text-slate-800" value="0">
                     </div>
                     <div class="animal-card border-b-[6px] border-blue-400">
                         <img src="https://cdn-icons-png.flaticon.com/512/1998/1998781.png" class="w-10 mx-auto mb-3">
                         <label class="text-[10px] font-black uppercase text-slate-400 block mb-2 tracking-tighter">Bebiri</label>
-                        <input type="number" name="h_bebiri" class="w-full text-center font-black outline-none text-lg text-slate-800" value="0">
+                        <input type="number" name="h_bebiri" class="calc-h w-full text-center font-black outline-none text-lg text-slate-800" value="0">
                     </div>
                     <div class="animal-card border-b-[6px] border-pink-400">
                         <img src="https://cdn-icons-png.flaticon.com/512/1998/1998713.png" class="w-10 mx-auto mb-3">
                         <label class="text-[10px] font-black uppercase text-slate-400 block mb-2 tracking-tighter">Babi</label>
-                        <input type="number" name="h_babi" class="w-full text-center font-black outline-none text-lg text-slate-800" value="0">
+                        <input type="number" name="h_babi" class="calc-h w-full text-center font-black outline-none text-lg text-slate-800" value="0">
                     </div>
                     <div class="animal-card border-b-[6px] border-yellow-400">
                         <img src="https://cdn-icons-png.flaticon.com/512/1998/1998610.png" class="w-10 mx-auto mb-3">
                         <label class="text-[10px] font-black uppercase text-slate-400 block mb-2 tracking-tighter">Ayam</label>
-                        <input type="number" name="h_ayam" class="w-full text-center font-black outline-none text-lg text-slate-800" value="0">
+                        <input type="number" name="h_ayam" class="calc-h w-full text-center font-black outline-none text-lg text-slate-800" value="0">
                     </div>
                     <div class="animal-card border-b-[6px] border-red-400">
                         <img src="https://cdn-icons-png.flaticon.com/512/1998/1998627.png" class="w-10 mx-auto mb-3">
                         <label class="text-[10px] font-black uppercase text-slate-400 block mb-2 tracking-tighter">Anjing</label>
-                        <input type="number" name="h_anjing" class="w-full text-center font-black outline-none text-lg text-slate-800" value="0">
+                        <input type="number" name="h_anjing" class="calc-h w-full text-center font-black outline-none text-lg text-slate-800" value="0">
                     </div>
                     <div class="animal-card border-b-[6px] border-indigo-400">
                         <img src="https://cdn-icons-png.flaticon.com/512/1998/1998592.png" class="w-10 mx-auto mb-3">
                         <label class="text-[10px] font-black uppercase text-slate-400 block mb-2 tracking-tighter">Kucing</label>
-                        <input type="number" name="h_kucing" class="w-full text-center font-black outline-none text-lg text-slate-800" value="0">
+                        <input type="number" name="h_kucing" class="calc-h w-full text-center font-black outline-none text-lg text-slate-800" value="0">
                     </div>
                     <div class="animal-card border-b-[6px] border-emerald-400">
                         <img src="https://cdn-icons-png.flaticon.com/512/1998/1998748.png" class="w-10 mx-auto mb-3">
                         <label class="text-[10px] font-black uppercase text-slate-400 block mb-2 tracking-tighter">Arnab</label>
-                        <input type="number" name="h_arnab" class="w-full text-center font-black outline-none text-lg text-slate-800" value="0">
+                        <input type="number" name="h_arnab" class="calc-h w-full text-center font-black outline-none text-lg text-slate-800" value="0">
                     </div>
                     <div class="animal-card border-b-[6px] border-sky-400">
                         <img src="https://cdn-icons-png.flaticon.com/512/1998/1998725.png" class="w-10 mx-auto mb-3">
                         <label class="text-[10px] font-black uppercase text-slate-400 block mb-2 tracking-tighter">Burung</label>
-                        <input type="number" name="h_burung" class="w-full text-center font-black outline-none text-lg text-slate-800" value="0">
+                        <input type="number" name="h_burung" class="calc-h w-full text-center font-black outline-none text-lg text-slate-800" value="0">
                     </div>
                     <div class="animal-card border-b-[6px] border-purple-400">
                         <img src="https://cdn-icons-png.flaticon.com/512/1998/1998656.png" class="w-10 mx-auto mb-3">
                         <label class="text-[10px] font-black uppercase text-slate-400 block mb-2 tracking-tighter">Hamster</label>
-                        <input type="number" name="h_hamster" class="w-full text-center font-black outline-none text-lg text-slate-800" value="0">
+                        <input type="number" name="h_hamster" class="calc-h w-full text-center font-black outline-none text-lg text-slate-800" value="0">
                     </div>
                 </div>
             </div>
 
             <!-- SECTION C: KARKAS -->
             <div class="card-glass p-10">
-                <div class="section-header border-blue-100">
-                    <img src="https://cdn-icons-png.flaticon.com/512/3082/3082011.png" class="w-12 h-12" alt="Frozen">
-                    <h3 class="font-black text-blue-900 uppercase text-base tracking-widest">C. Karkas & Produk Sejuk Beku</h3>
+                <div class="section-header border-blue-100 flex justify-between items-center">
+                    <div class="flex items-center gap-4">
+                        <img src="https://cdn-icons-png.flaticon.com/512/3082/3082011.png" class="w-12 h-12" alt="Frozen">
+                        <h3 class="font-black text-blue-900 uppercase text-base tracking-widest">C. Karkas & Produk Sejuk Beku</h3>
+                    </div>
+                    <div class="bg-blue-100 px-4 py-2 rounded-xl border-2 border-blue-200">
+                        <span class="text-[10px] font-black text-blue-600 uppercase block leading-none">Jumlah Unit/KG</span>
+                        <span id="total_p" class="text-xl font-black text-blue-800">0</span>
+                    </div>
                 </div>
                 <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-5">
                     <div class="bg-blue-50/50 p-4 rounded-2xl border-2 border-blue-100 flex items-center gap-4">
                         <span class="text-3xl">🥩</span>
                         <div>
                             <label class="text-[11px] font-black text-blue-600 block uppercase tracking-tight">Karkas Lembu</label>
-                            <input type="number" name="p_klembu" class="w-full font-black outline-none text-lg bg-transparent text-slate-800" value="0">
+                            <input type="number" name="p_klembu" class="calc-p w-full font-black outline-none text-lg bg-transparent text-slate-800" value="0">
                         </div>
                     </div>
                     <div class="bg-blue-50/50 p-4 rounded-2xl border-2 border-blue-100 flex items-center gap-4">
                         <span class="text-3xl">🥩</span>
                         <div>
                             <label class="text-[11px] font-black text-blue-600 block uppercase tracking-tight">Karkas Kerbau</label>
-                            <input type="number" name="p_kkerbau" class="w-full font-black outline-none text-lg bg-transparent text-slate-800" value="0">
+                            <input type="number" name="p_kkerbau" class="calc-p w-full font-black outline-none text-lg bg-transparent text-slate-800" value="0">
                         </div>
                     </div>
                     <div class="bg-blue-50/50 p-4 rounded-2xl border-2 border-blue-100 flex items-center gap-4">
                         <span class="text-3xl">🥩</span>
                         <div>
                             <label class="text-[11px] font-black text-blue-600 block uppercase tracking-tight">Karkas Kambing</label>
-                            <input type="number" name="p_kkambing" class="w-full font-black outline-none text-lg bg-transparent text-slate-800" value="0">
+                            <input type="number" name="p_kkambing" class="calc-p w-full font-black outline-none text-lg bg-transparent text-slate-800" value="0">
                         </div>
                     </div>
                     <div class="bg-blue-50/50 p-4 rounded-2xl border-2 border-blue-100 flex items-center gap-4">
                         <span class="text-3xl">🥩</span>
                         <div>
                             <label class="text-[11px] font-black text-blue-600 block uppercase tracking-tight">Karkas Babi</label>
-                            <input type="number" name="p_kbabi" class="w-full font-black outline-none text-lg bg-transparent text-slate-800" value="0">
+                            <input type="number" name="p_kbabi" class="calc-p w-full font-black outline-none text-lg bg-transparent text-slate-800" value="0">
                         </div>
                     </div>
                     <div class="bg-red-50/50 p-4 rounded-2xl border-2 border-red-100 flex items-center gap-4">
                         <span class="text-3xl">❄️</span>
                         <div>
                             <label class="text-[11px] font-black text-red-600 block uppercase tracking-tight">Karkas Babi SB</label>
-                            <input type="number" name="p_kbabisb" class="w-full font-black outline-none text-lg bg-transparent text-slate-800" value="0">
+                            <input type="number" name="p_kbabisb" class="calc-p w-full font-black outline-none text-lg bg-transparent text-slate-800" value="0">
                         </div>
                     </div>
                     <div class="bg-blue-50/50 p-4 rounded-2xl border-2 border-blue-100 flex items-center gap-4">
                         <span class="text-3xl">🍗</span>
                         <div>
                             <label class="text-[11px] font-black text-blue-600 block uppercase tracking-tight">Karkas Ayam</label>
-                            <input type="number" name="p_kayam" class="w-full font-black outline-none text-lg bg-transparent text-slate-800" value="0">
+                            <input type="number" name="p_kayam" class="calc-p w-full font-black outline-none text-lg bg-transparent text-slate-800" value="0">
                         </div>
                     </div>
                     <div class="bg-blue-50/50 p-4 rounded-2xl border-2 border-blue-100 flex items-center gap-4">
                         <span class="text-3xl">🦆</span>
                         <div>
                             <label class="text-[11px] font-black text-blue-600 block uppercase tracking-tight">SB Itik</label>
-                            <input type="number" name="p_sbitik" class="w-full font-black outline-none text-lg bg-transparent text-slate-800" value="0">
+                            <input type="number" name="p_sbitik" class="calc-p w-full font-black outline-none text-lg bg-transparent text-slate-800" value="0">
                         </div>
                     </div>
                     <div class="bg-blue-50/50 p-4 rounded-2xl border-2 border-blue-100 flex items-center gap-4">
                         <span class="text-3xl">🍗</span>
                         <div>
                             <label class="text-[11px] font-black text-blue-600 block uppercase tracking-tight">SB Ayam</label>
-                            <input type="number" name="p_sbayam" class="w-full font-black outline-none text-lg bg-transparent text-slate-800" value="0">
+                            <input type="number" name="p_sbayam" class="calc-p w-full font-black outline-none text-lg bg-transparent text-slate-800" value="0">
                         </div>
                     </div>
                     <div class="bg-blue-50/50 p-4 rounded-2xl border-2 border-blue-100 flex items-center gap-4">
                         <span class="text-3xl">🐖</span>
                         <div>
                             <label class="text-[11px] font-black text-blue-600 block uppercase tracking-tight">SB Babi</label>
-                            <input type="number" name="p_sbbabi" class="w-full font-black outline-none text-lg bg-transparent text-slate-800" value="0">
+                            <input type="number" name="p_sbbabi" class="calc-p w-full font-black outline-none text-lg bg-transparent text-slate-800" value="0">
                         </div>
                     </div>
                     <div class="bg-slate-100 p-4 rounded-2xl border-2 border-slate-200 flex items-center gap-4">
                         <span class="text-3xl">🥫</span>
                         <div>
                             <label class="text-[11px] font-black text-slate-500 block uppercase tracking-tight">Produk Haiwan (Tin)</label>
-                            <input type="number" name="p_tin" class="w-full font-black outline-none text-lg bg-transparent text-slate-800" value="0">
+                            <input type="number" name="p_tin" class="calc-p w-full font-black outline-none text-lg bg-transparent text-slate-800" value="0">
                         </div>
                     </div>
                 </div>
@@ -423,7 +467,7 @@
         </form>
 
         <!-- RECORD TABLE -->
-        <div class="card-glass p-10 no-print">
+        <div class="card-glass p-10 no-print" id="recordTable_wrapper">
             <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-6">
                 <h3 class="font-black text-slate-900 uppercase text-base flex items-center gap-4 tracking-widest">
                     <i data-lucide="database" class="text-blue-600 w-7 h-7"></i> Rekod Tersimpan Dalam Sistem
@@ -452,7 +496,7 @@
     </main>
 
     <footer class="text-center py-16 text-[11px] font-black text-slate-400 uppercase no-print tracking-[0.3em]">
-        &copy; 2024 JPV - Bahagian Penguatkuasa | v8.0 System
+        &copy; 2024 JPV - Bahagian Penguatkuasa | v9.0 System
     </footer>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -544,6 +588,26 @@
             window.location.href = `mailto:?subject=${subject}&body=${body}`;
         }
 
+        // --- CALCULATION LOGIC ---
+        function updateSubTotals() {
+            // Calc Section B
+            const hInputs = document.querySelectorAll('.calc-h');
+            let sumH = 0;
+            hInputs.forEach(input => sumH += Number(input.value || 0));
+            document.getElementById('total_h').innerText = sumH;
+
+            // Calc Section C
+            const pInputs = document.querySelectorAll('.calc-p');
+            let sumP = 0;
+            pInputs.forEach(input => sumP += Number(input.value || 0));
+            document.getElementById('total_p').innerText = sumP;
+        }
+
+        // Add event listeners to all number inputs for auto-calc
+        document.querySelectorAll('.calc-h, .calc-p').forEach(input => {
+            input.addEventListener('input', updateSubTotals);
+        });
+
         // DATA STORAGE LOGIC
         let db = JSON.parse(localStorage.getItem('bpk_v18_db')) || [];
 
@@ -601,6 +665,7 @@
                 document.getElementById('btnDeleteCurrent').classList.remove('hidden');
                 
                 calcTotal();
+                updateSubTotals(); // Update B and C totals after loading
                 window.scrollTo({ top: 0, behavior: 'smooth' });
             }
         }
@@ -639,6 +704,7 @@
             document.getElementById('caseOfficer').value = document.getElementById('userName').value;
             if (marker) map.removeLayer(marker);
             calcTotal();
+            updateSubTotals();
         }
 
         function calcTotal() {
