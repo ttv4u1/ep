@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>e-Penguatkuasa v20 | BPK Dashboard</title>
+    <title>e-Penguatkuasa v21.0 | BPK Dashboard</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
@@ -76,14 +76,28 @@
 
         #map { height: 350px; border-radius: 24px; margin-top: 15px; border: 2px solid #f1f5f9; z-index: 10; }
 
+        /* LOGO STYLING - UPDATED FOR CORPORATE LOOK */
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
         .logo-img {
-            height: 45px;
+            height: 32px; /* Default mobile height */
             width: auto;
             object-fit: contain;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.05));
         }
 
-        @media (min-width: 768px) {
-            .logo-img { height: 55px; }
+        @media (min-width: 640px) {
+            .logo-img { height: 42px; }
+            .logo-container { gap: 12px; }
+        }
+
+        @media (min-width: 1024px) {
+            .logo-img { height: 52px; }
+            .logo-container { gap: 16px; }
         }
 
         label.input-label {
@@ -145,36 +159,45 @@
 </head>
 <body class="p-0 m-0 antialiased">
 
-    <!-- TOP NAVIGATION - UPDATED FOR AUTOHIDE PROFILE -->
-    <header class="sticky top-0 z-40 bg-white/80 backdrop-blur-md border-b border-gray-100 no-print">
-        <div class="max-w-screen-2xl mx-auto px-4 md:px-8 py-3 flex justify-between items-center">
-            <div class="flex items-center gap-3 md:gap-6">
-                <!-- Logos hidden on very small screens to save space -->
-                <img src="https://www.akm.gov.my/images/madani/JATA%20NEGARA%20AI-01.png" class="logo-img hidden sm:block" alt="Jata">
-                <img src="https://github.com/ttv4u1/KP/raw/main/DVS.svg" class="logo-img" alt="JPV">
-                <img src="https://github.com/ttv4u1/KP/raw/main/Logo%20Penguatkuasa.png" class="logo-img" alt="BPK">
+    <!-- TOP NAVIGATION - RE-ENGINEERED FOR CORPORATE LOGO LAYOUT -->
+    <header class="sticky top-0 z-40 bg-white/90 backdrop-blur-lg border-b border-gray-200 no-print">
+        <div class="max-w-screen-2xl mx-auto px-3 md:px-8 py-2 md:py-4 flex justify-between items-center">
+            
+            <!-- LOGO GROUP -->
+            <div class="flex items-center">
+                <div class="logo-container">
+                    <img src="https://www.akm.gov.my/images/madani/JATA%20NEGARA%20AI-01.png" class="logo-img" alt="Jata">
+                    <img src="https://github.com/ttv4u1/KP/raw/main/DVS.svg" class="logo-img" alt="JPV">
+                    <img src="https://github.com/ttv4u1/KP/raw/main/Logo%20Penguatkuasa.png" class="logo-img" alt="BPK">
+                </div>
                 
-                <div class="border-l-2 pl-3 md:pl-6 border-gray-200">
-                    <p class="text-[10px] md:text-sm font-black text-slate-800 leading-none uppercase tracking-tighter">JPV MALAYSIA</p>
-                    <p class="text-[8px] md:text-[11px] font-extrabold text-blue-600 uppercase tracking-widest mt-1">BPK</p>
+                <!-- CORPORATE DIVIDER & TEXT -->
+                <div class="ml-3 md:ml-6 pl-3 md:pl-6 border-l-2 border-slate-200 flex flex-col justify-center">
+                    <h1 class="text-[10px] md:text-sm lg:text-base font-extrabold text-slate-800 leading-none uppercase tracking-tight">
+                        JPV <span class="hidden sm:inline">MALAYSIA</span>
+                    </h1>
+                    <p class="text-[7px] md:text-[9px] lg:text-[10px] font-bold text-blue-600 uppercase tracking-[0.1em] md:tracking-[0.2em] mt-1">
+                        <span class="hidden xs:inline">Bahagian</span> Penguatkuasa
+                    </p>
                 </div>
             </div>
 
-            <div class="flex items-center gap-3 md:gap-5">
-                <div class="hidden lg:block text-right mr-4">
-                    <div id="clock" class="text-lg font-black text-slate-900 leading-none tracking-tight">00:00:00 AM</div>
+            <!-- ACTION GROUP -->
+            <div class="flex items-center gap-2 md:gap-5">
+                <div class="hidden lg:block text-right mr-2">
+                    <div id="clock" class="text-sm font-bold text-slate-500 tabular-nums">00:00:00 AM</div>
                 </div>
                 
-                <button onclick="window.print()" class="p-2.5 md:p-3.5 rounded-2xl bg-slate-50 hover:bg-slate-100 text-slate-600 transition border border-slate-100">
-                    <i data-lucide="printer" class="w-5 h-5 md:w-6 md:h-6"></i>
+                <button onclick="window.print()" class="p-2 md:p-3 rounded-xl bg-slate-50 hover:bg-slate-100 text-slate-500 transition border border-slate-200">
+                    <i data-lucide="printer" class="w-4 h-4 md:w-5 md:h-5"></i>
                 </button>
 
-                <!-- PROFILE BUTTON: Autohide text on mobile -->
-                <button onclick="toggleProfile()" class="flex items-center gap-0 md:gap-4 bg-slate-950 text-white p-1.5 md:p-2 md:pr-6 rounded-full md:rounded-[22px] hover:bg-slate-800 transition shadow-xl border border-white/10">
-                    <img id="navAvatar" src="https://api.dicebear.com/7.x/avataaars/svg?seed=Ahmad" class="w-9 h-9 md:w-11 md:h-11 rounded-full md:rounded-xl bg-white object-cover">
+                <!-- PROFILE BUTTON -->
+                <button onclick="toggleProfile()" class="flex items-center gap-2 md:gap-3 bg-slate-900 text-white p-1 md:p-1.5 md:pr-5 rounded-full md:rounded-2xl hover:bg-slate-800 transition shadow-lg shadow-slate-200">
+                    <img id="navAvatar" src="https://api.dicebear.com/7.x/avataaars/svg?seed=Ahmad" class="w-8 h-8 md:w-10 md:h-10 rounded-full md:rounded-xl bg-white object-cover">
                     <div class="text-left hidden md:block">
-                        <p class="text-[12px] font-black uppercase leading-none tracking-tight" id="navName">Ahmad Firdaus</p>
-                        <p class="text-[9px] font-extrabold text-blue-400 uppercase tracking-widest mt-1" id="navGred">KP22</p>
+                        <p class="text-[10px] font-bold uppercase leading-none tracking-wide" id="navName">Ahmad Firdaus</p>
+                        <p class="text-[8px] font-medium text-blue-400 uppercase tracking-widest mt-0.5" id="navGred">KP22</p>
                     </div>
                 </button>
             </div>
@@ -503,7 +526,7 @@
     </main>
 
     <footer class="text-center py-16 text-[10px] md:text-[11px] font-black text-slate-400 uppercase no-print tracking-[0.3em]">
-        &copy; 2024 JPV - Bahagian Penguatkuasa | v20 System
+        &copy; 2024 JPV - Bahagian Penguatkuasa | v21.0 System
     </footer>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
