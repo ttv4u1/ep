@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>e-Penguatkuasa v27 | BPK Dashboard</title>
+    <title>e-Penguatkuasa v29 | BPK Dashboard</title>
     
     <link rel="icon" type="image/png" href="https://github.com/ttv4u1/KP/raw/main/Logo%20Penguatkuasa.png">
     <script src="https://cdn.tailwindcss.com"></script>
@@ -22,7 +22,7 @@
             background-position: center;
             background-repeat: no-repeat;
             background-size: 600px;
-            font-size: 18px; /* Ditingkatkan dari 16px */
+            font-size: 18px;
         }
 
         .card-glass {
@@ -98,7 +98,18 @@
             margin-left: 4px;
         }
 
-        /* PRINT SETTINGS - OPTIMIZED FOR A4 SINGLE PAGE */
+        .avatar-upload-btn {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            background: #4f46e5;
+            color: white;
+            padding: 8px;
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
         @media print {
             @page { size: A4; margin: 0.8cm; }
             body { background: white !important; font-size: 9pt !important; color: black !important; }
@@ -124,7 +135,7 @@
     <div class="print-only-header">
         <img src="https://github.com/ttv4u1/KP/raw/main/Logo%20Penguatkuasa.png" alt="Logo">
         <h2>JABATAN PERKHIDMATAN VETERINAR MALAYSIA</h2>
-        <p>BAHAGIAN PENGUATKUASAAN - LAPORAN HARIAN KES (v27)</p>
+        <p>BAHAGIAN PENGUATKUASAAN - LAPORAN HARIAN KES (v29)</p>
     </div>
 
     <!-- TOP NAVIGATION -->
@@ -134,28 +145,43 @@
                 <img src="https://github.com/ttv4u1/KP/raw/main/Logo%20Penguatkuasa.png" class="h-12 w-auto" alt="BPK">
                 <div class="ml-4 pl-4 border-l-2 border-slate-200">
                     <h1 class="text-xl font-black text-slate-800 uppercase leading-tight">JPV MALAYSIA</h1>
-                    <p class="text-xs font-bold text-indigo-600 uppercase tracking-widest">e-Penguatkuasa <span class="ml-2 text-slate-400">v27</span></p>
+                    <p class="text-xs font-bold text-indigo-600 uppercase tracking-widest">e-Penguatkuasa <span class="ml-2 text-slate-400">v29</span></p>
                 </div>
             </div>
 
             <div class="flex items-center gap-3">
                 <div id="clock" class="hidden lg:block text-lg font-black text-slate-700 tabular-nums mr-6">00:00:00 AM</div>
-                <button onclick="exportToExcel()" class="p-3 rounded-xl bg-emerald-600 text-white flex items-center gap-2 text-sm font-bold hover:bg-emerald-700 transition shadow-lg shadow-emerald-200">
+                
+                <button onclick="clearForm()" class="p-3 rounded-xl bg-indigo-600 text-white flex items-center gap-2 text-sm font-bold hover:bg-indigo-700 transition shadow-lg">
+                    <i data-lucide="plus-circle" class="w-5 h-5"></i> REKOD BARU
+                </button>
+
+                <button onclick="exportToExcel()" class="p-3 rounded-xl bg-emerald-600 text-white flex items-center gap-2 text-sm font-bold hover:bg-emerald-700 transition shadow-lg">
                     <i data-lucide="file-spreadsheet" class="w-5 h-5"></i> EXCEL
                 </button>
                 <button onclick="window.print()" class="p-3 rounded-xl bg-slate-800 text-white flex items-center gap-2 text-sm font-bold hover:bg-slate-900 transition shadow-lg">
                     <i data-lucide="printer" class="w-5 h-5"></i> CETAK A4
                 </button>
-                <button onclick="toggleProfile()" class="flex items-center gap-3 bg-indigo-100 border-2 border-indigo-200 p-1.5 rounded-2xl hover:bg-indigo-200 transition">
-                    <img id="navAvatar" src="https://api.dicebear.com/7.x/avataaars/svg?seed=Ahmad" class="w-10 h-10 rounded-xl bg-white shadow-sm">
+                <button onclick="toggleProfile()" class="flex items-center gap-3 bg-indigo-100 border-2 border-indigo-200 p-1.5 rounded-2xl hover:bg-indigo-200 transition overflow-hidden">
+                    <img id="navAvatar" src="https://api.dicebear.com/7.x/avataaars/svg?seed=Ahmad" class="w-10 h-10 rounded-xl bg-white shadow-sm object-cover">
                 </button>
             </div>
         </div>
     </header>
 
     <main class="max-w-screen-2xl mx-auto p-4 md:p-8 space-y-8">
+        <!-- STATUS BAR -->
+        <div id="viewingBadge" class="hidden bg-amber-100 border-2 border-amber-200 p-4 rounded-2xl flex justify-between items-center no-print">
+            <div class="flex items-center gap-3 text-amber-800">
+                <i data-lucide="info" class="w-6 h-6"></i>
+                <span class="font-bold">MOD PAPARAN: Anda sedang melihat rekod sedia ada.</span>
+            </div>
+            <button onclick="clearForm()" class="text-amber-900 font-black text-sm uppercase underline">Tutup & Buat Baru</button>
+        </div>
+
         <form id="mainForm">
             <input type="hidden" id="current_record_id" name="id">
+            <input type="hidden" id="record_status" name="status" value="DRAF">
 
             <!-- SECTION A: PENTADBIRAN -->
             <div class="card-glass p-8">
@@ -173,7 +199,7 @@
                             <option>SEPTEMBER</option><option>OKTOBER</option><option>NOVEMBER</option><option>DISEMBER</option>
                         </select>
                     </div>
-                    <div class="lg:col-span-2"><label class="input-label">Pegawai Penguatkuasa</label><input type="text" name="penguatkuasa" id="caseOfficer" class="form-input-modern"></div>
+                    <div class="lg:col-span-2"><label class="input-label">Pegawai Penguatkuasa</label><input type="text" name="penguatkuasa" id="caseOfficer" class="form-input-modern" readonly></div>
                     <div><label class="input-label">Kategori Kes</label><input type="text" name="kategori_kes" class="form-input-modern" placeholder="Cth: Import"></div>
                     
                     <div class="lg:col-span-2"><label class="input-label">No Repot Polis</label><input type="text" name="repot_polis" class="form-input-modern"></div>
@@ -271,11 +297,16 @@
 
             <!-- ACTIONS -->
             <div class="flex justify-between items-center no-print py-6">
-                <button type="button" onclick="clearForm()" class="px-6 py-3 text-slate-500 font-bold text-sm uppercase hover:text-red-600 transition">Reset Borang</button>
+                <button type="button" onclick="clearForm()" class="px-6 py-3 text-slate-500 font-bold text-sm uppercase hover:text-red-600 transition">Kosongkan Borang</button>
                 <div class="flex gap-4">
                     <button id="btnDeleteCurrent" type="button" onclick="deleteCurrentRecord()" class="hidden px-8 py-4 bg-red-50 text-red-600 rounded-2xl font-black text-sm uppercase border-2 border-red-100 hover:bg-red-100 transition">Hapus Rekod</button>
-                    <button type="button" onclick="saveData()" class="px-10 py-4 bg-indigo-600 text-white rounded-2xl font-black text-sm uppercase shadow-xl shadow-indigo-200 hover:bg-indigo-700 hover:-translate-y-1 transition-all flex items-center gap-2">
-                        <i data-lucide="save" class="w-5 h-5"></i> Simpan Rekod
+                    
+                    <button type="button" onclick="saveData(false)" class="px-8 py-4 bg-slate-200 text-slate-700 rounded-2xl font-black text-sm uppercase hover:bg-slate-300 transition-all flex items-center gap-2">
+                        <i data-lucide="save" class="w-5 h-5"></i> Simpan Draf
+                    </button>
+
+                    <button type="button" onclick="saveData(true)" class="px-10 py-4 bg-indigo-600 text-white rounded-2xl font-black text-sm uppercase shadow-xl shadow-indigo-200 hover:bg-indigo-700 hover:-translate-y-1 transition-all flex items-center gap-2">
+                        <i data-lucide="send" class="w-5 h-5"></i> Hantar Laporan
                     </button>
                 </div>
             </div>
@@ -284,16 +315,16 @@
         <!-- RECORD TABLE -->
         <div class="card-glass p-8 no-print shadow-xl" id="recordTable_wrapper">
             <div class="flex justify-between items-center mb-6">
-                <h3 class="font-black text-slate-900 uppercase text-sm tracking-widest">Pangkalan Data Rekod (Tersimpan Secara Lokal)</h3>
+                <h3 class="font-black text-slate-900 uppercase text-sm tracking-widest">Pangkalan Data Rekod (v29)</h3>
             </div>
             <div class="overflow-x-auto rounded-xl border border-slate-100">
                 <table class="w-full text-left text-sm">
                     <thead class="bg-slate-800 text-white uppercase font-bold">
                         <tr>
+                            <th class="p-4">Status</th>
                             <th class="p-4">Bil/Tahun</th>
                             <th class="p-4">No IP/Repot</th>
                             <th class="p-4">Kesalahan</th>
-                            <th class="p-4">Pegawai</th>
                             <th class="p-4">Nilai (RM)</th>
                             <th class="p-4 text-center">Aksi</th>
                         </tr>
@@ -313,11 +344,39 @@
             <button onclick="toggleProfile()" class="p-2 hover:bg-slate-100 rounded-full"><i data-lucide="x"></i></button>
         </div>
         <div class="space-y-6">
-            <div class="text-center mb-8">
-                <img id="sideAvatar" src="https://api.dicebear.com/7.x/avataaars/svg?seed=Ahmad" class="w-24 h-24 rounded-3xl mx-auto bg-indigo-50 p-2 border-2 border-indigo-100 shadow-lg">
+            <div class="text-center mb-8 relative inline-block w-full">
+                <div class="relative w-32 h-32 mx-auto">
+                    <img id="sideAvatar" src="https://api.dicebear.com/7.x/avataaars/svg?seed=Ahmad" class="w-32 h-32 rounded-3xl mx-auto bg-indigo-50 p-1 border-2 border-indigo-100 shadow-lg object-cover">
+                    <label for="photoUpload" class="avatar-upload-btn">
+                        <i data-lucide="camera" class="w-5 h-5"></i>
+                    </label>
+                    <input type="file" id="photoUpload" class="hidden" accept="image/*" onchange="previewPhoto(event)">
+                </div>
             </div>
-            <div><label class="input-label">Nama Penuh</label><input type="text" id="userName" oninput="updateProfileDisplay()" class="form-input-modern" value="AHMAD FIRDAUS BIN ALI"></div>
+            <div><label class="input-label">Nama Penuh</label><input type="text" id="userName" oninput="updateProfileDisplay()" class="form-input-modern" value="PEGAWAI PENGUATKUASA"></div>
             <div><label class="input-label">Gred/Jawatan</label><input type="text" id="userGred" oninput="updateProfileDisplay()" class="form-input-modern" value="KP22"></div>
+            <div><label class="input-label">Cawangan / Negeri</label>
+                <select id="userCawangan" onchange="updateProfileDisplay()" class="form-input-modern">
+                    <option value="">PILIH NEGERI</option>
+                    <option value="IBU PEJABAT">IBU PEJABAT</option>
+                    <option value="PERLIS">PERLIS</option>
+                    <option value="KEDAH">KEDAH</option>
+                    <option value="PULAU PINANG">PULAU PINANG</option>
+                    <option value="PERAK">PERAK</option>
+                    <option value="SELANGOR">SELANGOR</option>
+                    <option value="WP KUALA LUMPUR">WP KUALA LUMPUR</option>
+                    <option value="WP PUTRAJAYA">WP PUTRAJAYA</option>
+                    <option value="NEGERI SEMBILAN">NEGERI SEMBILAN</option>
+                    <option value="MELAKA">MELAKA</option>
+                    <option value="JOHOR">JOHOR</option>
+                    <option value="PAHANG">PAHANG</option>
+                    <option value="TERENGGANU">TERENGGANU</option>
+                    <option value="KELANTAN">KELANTAN</option>
+                    <option value="SABAH">SABAH</option>
+                    <option value="SARAWAK">SARAWAK</option>
+                    <option value="WP LABUAN">WP LABUAN</option>
+                </select>
+            </div>
             <p class="text-[10px] text-slate-400 font-bold uppercase mt-20 text-center italic">Sistem ini menyimpan data dalam pelayar anda sahaja.</p>
         </div>
     </aside>
@@ -326,7 +385,6 @@
     <script>
         lucide.createIcons();
         
-        // Map Setup
         const map = L.map('map').setView([3.1390, 101.6869], 11);
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             attribution: '© OpenStreetMap contributors'
@@ -341,24 +399,47 @@
 
         function toggleProfile() { document.getElementById('profileSidebar').classList.toggle('active'); }
         
+        function previewPhoto(event) {
+            const reader = new FileReader();
+            reader.onload = function(){
+                const output = document.getElementById('sideAvatar');
+                const navOutput = document.getElementById('navAvatar');
+                output.src = reader.result;
+                navOutput.src = reader.result;
+                saveProfileInfo();
+            };
+            reader.readAsDataURL(event.target.files[0]);
+        }
+
         function updateProfileDisplay() {
             const name = document.getElementById('userName').value;
-            document.getElementById('caseOfficer').value = name;
+            const cawangan = document.getElementById('userCawangan').value;
+            document.getElementById('caseOfficer').value = `${name} (${cawangan})`;
             saveProfileInfo();
         }
 
         function saveProfileInfo() {
-            const profileData = { name: document.getElementById('userName').value, gred: document.getElementById('userGred').value };
-            localStorage.setItem('bpk_user_profile_v27', JSON.stringify(profileData));
+            const profileData = { 
+                name: document.getElementById('userName').value, 
+                gred: document.getElementById('userGred').value,
+                cawangan: document.getElementById('userCawangan').value,
+                photo: document.getElementById('sideAvatar').src
+            };
+            localStorage.setItem('bpk_user_profile_v29', JSON.stringify(profileData));
         }
 
         function loadSavedProfile() {
-            const savedInfo = localStorage.getItem('bpk_user_profile_v27');
+            const savedInfo = localStorage.getItem('bpk_user_profile_v29');
             if (savedInfo) {
                 const data = JSON.parse(savedInfo);
-                document.getElementById('userName').value = data.name;
-                document.getElementById('userGred').value = data.gred;
-                document.getElementById('caseOfficer').value = data.name;
+                document.getElementById('userName').value = data.name || "";
+                document.getElementById('userGred').value = data.gred || "";
+                document.getElementById('userCawangan').value = data.cawangan || "";
+                if(data.photo) {
+                    document.getElementById('sideAvatar').src = data.photo;
+                    document.getElementById('navAvatar').src = data.photo;
+                }
+                document.getElementById('caseOfficer').value = `${data.name} (${data.cawangan})`;
             }
         }
 
@@ -371,14 +452,16 @@
 
         document.querySelectorAll('.calc-h, .calc-p').forEach(input => input.addEventListener('input', updateSubTotals));
 
-        let db = JSON.parse(localStorage.getItem('bpk_v27_db')) || [];
+        let db = JSON.parse(localStorage.getItem('bpk_v29_db')) || [];
 
-        function saveData() {
+        function saveData(isSubmit) {
             const form = document.getElementById('mainForm');
             const formData = new FormData(form);
             const data = Object.fromEntries(formData.entries());
             const recordId = document.getElementById('current_record_id').value;
+            
             data.total_rm = document.getElementById('v_total').value;
+            data.status = isSubmit ? "DIHANTAR" : "DRAF";
             
             if (recordId) { 
                 const index = db.findIndex(r => r.id == recordId); 
@@ -389,29 +472,33 @@
                 db.push(data); 
             }
             
-            localStorage.setItem('bpk_v27_db', JSON.stringify(db));
-            alert('Rekod berjaya disimpan!'); 
+            localStorage.setItem('bpk_v29_db', JSON.stringify(db));
+            alert(isSubmit ? 'Laporan telah berjaya dihantar!' : 'Draf berjaya disimpan.'); 
             renderTable(); 
             clearForm();
         }
 
         function renderTable() {
             const table = document.getElementById('recordTable');
-            table.innerHTML = db.slice().reverse().map(record => `
+            table.innerHTML = db.slice().reverse().map(record => {
+                const statusClass = record.status === 'DIHANTAR' ? 'bg-green-100 text-green-700' : 'bg-slate-100 text-slate-600';
+                return `
                 <tr class="hover:bg-slate-50 transition">
+                    <td class="p-4">
+                        <span class="px-2 py-1 rounded-md text-[10px] font-black uppercase ${statusClass}">${record.status || 'DRAF'}</span>
+                    </td>
                     <td class="p-4 font-bold text-slate-900">${record.bil || '-'}/${record.tahun || '-'}</td>
-                    <td class="p-4 font-medium text-slate-600">${record.no_kes_ip || record.repot_polis || 'DRAF'}</td>
+                    <td class="p-4 font-medium text-slate-600">${record.no_kes_ip || record.repot_polis || 'TIADA NO'}</td>
                     <td class="p-4 truncate max-w-[200px]">${record.kesalahan || '-'}</td>
-                    <td class="p-4 text-xs font-bold text-slate-500">${record.penguatkuasa || '-'}</td>
                     <td class="p-4 text-indigo-700 font-black">${record.total_rm}</td>
                     <td class="p-4 text-center">
                         <div class="flex gap-2 justify-center">
-                            <button onclick="viewRecord(${record.id})" class="p-2 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition" title="Lihat & Cetak"><i data-lucide="eye" class="w-5 h-5"></i></button>
+                            <button onclick="viewRecord(${record.id})" class="p-2 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition" title="Lihat & Edit"><i data-lucide="edit-3" class="w-5 h-5"></i></button>
                             <button onclick="deleteRecord(${record.id})" class="p-2 bg-red-100 text-red-700 rounded-lg hover:bg-red-200 transition" title="Hapus"><i data-lucide="trash-2" class="w-5 h-5"></i></button>
                         </div>
                     </td>
                 </tr>
-            `).join('');
+            `}).join('');
             lucide.createIcons();
         }
 
@@ -425,6 +512,7 @@
                 });
                 document.getElementById('current_record_id').value = r.id;
                 document.getElementById('btnDeleteCurrent').classList.remove('hidden');
+                document.getElementById('viewingBadge').classList.remove('hidden');
                 calcTotal(); updateSubTotals(); 
                 window.scrollTo({ top: 0, behavior: 'smooth' });
             }
@@ -433,7 +521,7 @@
         function deleteRecord(id) {
             if(confirm('Hapus rekod ini secara kekal?')) { 
                 db = db.filter(x => x.id !== id); 
-                localStorage.setItem('bpk_v27_db', JSON.stringify(db)); 
+                localStorage.setItem('bpk_v29_db', JSON.stringify(db)); 
                 renderTable(); 
                 clearForm(); 
             }
@@ -444,10 +532,13 @@
         function clearForm() {
             document.getElementById('mainForm').reset();
             document.getElementById('current_record_id').value = ""; 
+            document.getElementById('record_status').value = "DRAF";
             document.getElementById('btnDeleteCurrent').classList.add('hidden');
-            document.getElementById('caseOfficer').value = document.getElementById('userName').value;
+            document.getElementById('viewingBadge').classList.add('hidden');
+            loadSavedProfile(); // Reset the officer name to profile default
             if (marker) map.removeLayer(marker);
             calcTotal(); updateSubTotals();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
         function calcTotal() {
@@ -458,9 +549,8 @@
 
         ['v_animal', 'v_vehicle', 'v_cargo', 'v_other'].forEach(id => document.getElementById(id).addEventListener('input', calcTotal));
 
-        // EXCEL EXPORT
         const headersMap = {
-            bil: "BIL", tahun: "TAHUN", bulan: "BULAN", penguatkuasa: "PENGUATKUASA", kategori_kes: "KATEGORI KES",
+            status: "STATUS", bil: "BIL", tahun: "TAHUN", bulan: "BULAN", penguatkuasa: "PENGUATKUASA", kategori_kes: "KATEGORI KES",
             repot_polis: "NO REPOT POLIS", tarikh_kejadian: "TARIKH KEJADIAN", masa_kejadian: "MASA KEJADIAN",
             lokasi_kejadian: "LOKASI KEJADIAN", kesalahan: "KESALAHAN", undang_undang: "UNDANG-UNDANG",
             no_kes_ip: "NO KES IP", jenis_rampasan: "JENIS RAMPASAN", h_lembu: "LEMBU (EKOR)", h_kerbau: "KERBAU (EKOR)",
@@ -475,6 +565,7 @@
         };
 
         function exportToExcel() {
+            if (db.length === 0) { alert("Tiada data untuk dieksport."); return; }
             const data = db.map(row => {
                 let newRow = {};
                 Object.keys(headersMap).forEach(key => { newRow[headersMap[key]] = row[key] || ""; });
@@ -483,7 +574,7 @@
             const worksheet = XLSX.utils.json_to_sheet(data);
             const workbook = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(workbook, worksheet, "Laporan BPK");
-            XLSX.writeFile(workbook, `Laporan_BPK_v27_${new Date().toISOString().slice(0,10)}.xlsx`);
+            XLSX.writeFile(workbook, `Laporan_BPK_v29_${new Date().toISOString().slice(0,10)}.xlsx`);
         }
 
         function updateClock() { 
@@ -496,5 +587,3 @@
     </script>
 </body>
 </html>
-
---- END OF FILE ---
