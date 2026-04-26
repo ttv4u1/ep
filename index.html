@@ -178,7 +178,7 @@
                         <div class="sm:col-span-2"><label class="input-label">KES SERAHAN</label><input type="text" name="KES_SERAHAN" class="form-input-modern uppercase"></div>
                         <div class="sm:col-span-4"><label class="input-label">CATATAN</label><input type="text" name="CATATAN" class="form-input-modern uppercase"></div>
                     </div>
-                    <button type="button" id="btnSubmit" onclick="submitData()" class="no-print w-full bg-indigo-600 text-white font-black py-5 rounded-2xl shadow-xl hover:bg-indigo-700 transition active:scale-95 uppercase tracking-widest text-sm mt-8">Hantar & Simpan Rekod Centurion</button>
+                    <button type="button" id="btnSubmit" onclick="submitData()" class="no-print w-full bg-indigo-600 text-white font-black py-5 rounded-2xl shadow-xl hover:bg-indigo-700 transition active:scale-95 uppercase tracking-widest text-sm mt-8">SIMPAN & HANTAR KE HQ</button>
                 </div>
             </form>
         </main>
@@ -431,7 +431,7 @@
         }
 
         // --- UTILS ---
-        function resetForm() { document.getElementById('mainForm').reset(); document.getElementById('currentDocId').value = ""; document.getElementById('btnSubmit').innerText = "Hantar & Simpan Rekod Centurion"; document.getElementById('f_tahun').value = 2026; document.getElementById('disp_rm').value = "RM 0.00"; loadProfile(firebase.auth().currentUser); }
+        function resetForm() { document.getElementById('mainForm').reset(); document.getElementById('currentDocId').value = ""; document.getElementById('btnSubmit').innerText = "SIMPAN & HANTAR KE HQ"; document.getElementById('f_tahun').value = 2026; document.getElementById('disp_rm').value = "RM 0.00"; loadProfile(firebase.auth().currentUser); }
         function toggleHistory() { const s = document.getElementById('historySidebar'); s.style.left = (s.style.left === '0px') ? '-100%' : '0px'; if(s.style.left === '0px') fetchHistory(); }
         function toggleProfile() { const s = document.getElementById('profileSidebar'); s.style.right = (s.style.right === '0px') ? '-100%' : '0px'; }
         async function saveProfile() { await db.collection("users").doc(firebase.auth().currentUser.uid).set({ name: document.getElementById('p_name').value.toUpperCase(), cawangan: document.getElementById('p_caw').value.toUpperCase(), role: userRole }, {merge:true}); alert("Profil dikemaskini!"); location.reload(); }
