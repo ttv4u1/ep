@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>e-Penguatkuasa v80 - Pro Edition</title>
+    <title>e-Penguatkuasa v92 - Sovereign Pro Sync</title>
     
     <link rel="icon" type="image/png" href="https://github.com/ttv4u1/KP/raw/main/Logo%20Penguatkuasa.png">
     <script src="https://cdn.tailwindcss.com"></script>
@@ -15,290 +15,183 @@
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 
-    <!-- SheetJS -->
+    <!-- SheetJS for Excel Export -->
     <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
 
     <style>
-        body, html {
-            height: 100%; margin: 0;
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            background: #f1f5f9; color: #0f172a; 
-            font-size: 16px;
-            -webkit-tap-highlight-color: transparent;
-        }
-        @keyframes goldShimmer {
-            0% { background-position: -200% 0; }
-            100% { background-position: 200% 0; }
-        }
-        .premium-gold-btn {
-            background: linear-gradient(45deg, #b45309, #f59e0b, #fbbf24, #f59e0b, #b45309);
-            background-size: 200% auto;
-            color: #451a03;
-            box-shadow: 0 4px 15px rgba(245, 158, 11, 0.4);
-            transition: all 0.3s ease;
-            border: 1px solid rgba(251, 191, 36, 0.5);
-            animation: goldShimmer 4s linear infinite;
-        }
-        .premium-gold-btn:hover {
-            box-shadow: 0 0 25px rgba(251, 191, 36, 0.6);
-            transform: translateY(-2px);
-            color: #000;
-        }
-
-        .version-box {
-            display: inline-block;
-            background: linear-gradient(45deg, #b45309, #f59e0b, #fbbf24, #f59e0b, #b45309);
-            background-size: 200% auto;
-            animation: goldShimmer 3s linear infinite;
-            color: #451a03; 
-            padding: 2px 10px; 
-            border-radius: 8px;
-            font-weight: 900; 
-            font-size: 0.75em; 
-            vertical-align: middle;
-            box-shadow: 0 0 10px rgba(245, 158, 11, 0.4);
-            border: 1px solid rgba(251, 191, 36, 0.6);
-            text-shadow: 0.5px 0.5px 0px rgba(255, 255, 255, 0.3);
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-        }
-
-        .section-card {
-            background: white; border-radius: 24px; padding: 1.5rem;
-            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
-            border: 1px solid #e2e8f0; margin-bottom: 1.5rem;
-        }
-
-        .form-input-modern {
-            width: 100%; padding: 12px 16px; border-radius: 12px; border: 2px solid #cbd5e1;
-            background: #ffffff; font-weight: 700; font-size: 16px; transition: all 0.2s; color: #1e293b;
-        }
-        .form-input-modern::placeholder { color: #94a3b8; font-weight: 400; font-style: italic; font-size: 14px; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: #f1f5f9; color: #0f172a; -webkit-tap-highlight-color: transparent; }
+        .version-box { background: linear-gradient(45deg, #b45309, #fbbf24); color: #451a03; padding: 2px 10px; border-radius: 8px; font-weight: 900; font-size: 0.75em; }
+        .section-card { background: white; border-radius: 24px; padding: 1.5rem; border: 1px solid #e2e8f0; margin-bottom: 1.25rem; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .form-input-modern { width: 100%; padding: 12px 14px; border-radius: 12px; border: 2px solid #cbd5e1; font-weight: 700; font-size: 14px; background: white; transition: all 0.2s; }
         .form-input-modern:focus { border-color: #4f46e5; outline: none; box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1); }
-
-        .input-label {
-            font-size: 12px; font-weight: 800; text-transform: uppercase; color: #64748b; 
-            margin-bottom: 6px; display: block; letter-spacing: 0.05em;
-        }
-
-        .animal-grid-item { background: #f8fafc; padding: 10px; border-radius: 16px; border: 1px solid #e2e8f0; }
-
-        @media (max-width: 640px) {
-            .section-card { padding: 1rem; border-radius: 16px; margin-bottom: 1rem; }
-            header { padding: 0.75rem 0.5rem !important; }
-            .btn-action { padding: 8px 6px !important; font-size: 8px !important; }
-        }
-
+        .input-label { font-size: 11px; font-weight: 800; text-transform: uppercase; color: #64748b; margin-bottom: 6px; display: block; }
+        .premium-gold-btn { background: linear-gradient(45deg, #b45309, #fbbf24); color: #451a03; font-weight: 900; animation: goldShimmer 4s linear infinite; background-size: 200% auto; }
+        @keyframes goldShimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
+        #loader { display:none; position: fixed; inset: 0; background: rgba(255,255,255,0.95); z-index: 9999; align-items: center; justify-content: center; flex-direction: column; }
+        
         @media print {
-            @page { size: A4 portrait; margin: 0.4cm; }
-            body { background: white !important; font-size: 9pt !important; color: black !important; }
             .no-print { display: none !important; }
-            .section-card, .animal-grid-item, .bg-indigo-50, .bg-slate-900 { 
-                background: transparent !important; box-shadow: none !important; border: none !important; padding: 0 !important; margin-bottom: 6px !important; 
-            }
-            .print-section-title {
-                display: block !important; font-size: 9.5pt; font-weight: 900; border-bottom: 1.5px solid black; margin-top: 8px; margin-bottom: 4px; text-transform: uppercase;
-            }
-            .form-input-modern { 
-                border: none !important; border-bottom: 1px solid #000 !important; background: transparent !important;
-                padding: 1px 0 !important; font-size: 10pt !important; font-weight: 700 !important; border-radius: 0 !important;
-            }
-            .input-label { font-size: 8pt !important; margin-bottom: 0px !important; font-weight: 800 !important; color: #222 !important; }
-            .grid { display: grid !important; grid-template-columns: repeat(4, 1fr) !important; gap: 6px 12px !important; }
-            .sig-area { display: flex !important; justify-content: space-between; margin-top: 20px; }
-            .sig-box { width: 45%; font-size: 8pt; }
-            .sig-line { border-bottom: 1px solid black; height: 35px; margin-bottom: 4px; width: 90%; }
-            #print-header { display: block !important; margin-bottom: 5px; }
-            .header-top { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid black; padding-bottom: 5px; }
-            .header-top img { height: 35px; }
-            .header-top h1 { font-size: 11pt; font-weight: 900; margin:0; }
-            .print-officer-info { display: block !important; font-size: 8.5pt; font-weight: 800; text-align: left; line-height: 1.4; }
-            #print-timestamp { font-size: 8pt; text-align: right; font-weight: 700; }
+            body { background: white !important; }
+            .section-card { border: 1px solid #000 !important; border-radius: 0 !important; padding: 10px !important; margin-bottom: 10px !important; }
+            .form-input-modern { border: none !important; border-bottom: 1px solid #000 !important; border-radius: 0 !important; padding: 2px 0 !important; }
+            #app-content { display: block !important; opacity: 1 !important; }
         }
-
-        .print-section-title, #print-header, .sig-area, .print-officer-info { display: none; }
-        #loader { display:none; position: fixed; inset: 0; background: rgba(255,255,255,0.9); z-index: 9999; align-items: center; justify-content: center; flex-direction: column; }
     </style>
 </head>
 <body class="antialiased">
 
     <div id="loader">
-        <div class="w-10 h-10 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin"></div>
-        <p class="mt-4 font-black text-indigo-600 uppercase text-xs">Memproses Data v2.1...</p>
+        <div class="w-12 h-12 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin"></div>
+        <p id="loader-status" class="mt-4 font-black text-indigo-600 uppercase text-[10px] tracking-widest text-center px-6">MEMPROSES v92...</p>
+    </div>
+
+    <!-- Admin Modal -->
+    <div id="adminModal" class="hidden fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-[5000] p-4 flex items-center justify-center no-print">
+        <div class="bg-white w-full max-w-4xl rounded-[32px] max-h-[90vh] flex flex-col overflow-hidden shadow-2xl">
+            <div class="p-6 border-b flex justify-between items-center bg-slate-50">
+                <h2 class="font-black text-xl uppercase italic tracking-tighter">Panel Super Admin</h2>
+                <button onclick="closeAdminPanel()" class="p-2 hover:bg-slate-200 rounded-full transition"><i data-lucide="x"></i></button>
+            </div>
+            <div class="flex-1 overflow-y-auto p-6">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+                    <div class="bg-indigo-50 p-6 rounded-2xl border border-indigo-100"><p class="text-[10px] font-black text-indigo-600 uppercase">Total Kes</p><h3 id="statTotalKes" class="text-3xl font-black">0</h3></div>
+                    <div class="bg-emerald-50 p-6 rounded-2xl border border-emerald-100"><p class="text-[10px] font-black text-emerald-600 uppercase">Total RM</p><h3 id="statTotalRM" class="text-2xl font-black">RM 0</h3></div>
+                    <div class="bg-slate-50 p-6 rounded-2xl border border-slate-200"><p class="text-[10px] font-black text-slate-500 uppercase">Pegawai</p><h3 id="statTotalUsers" class="text-3xl font-black">0</h3></div>
+                </div>
+                <div class="bg-white border rounded-2xl overflow-hidden"><table class="w-full text-left text-sm"><thead class="bg-slate-50 text-[10px] font-black uppercase text-slate-500"><tr><th class="px-6 py-4">Pegawai</th><th class="px-6 py-4 text-right">Tindakan</th></tr></thead><tbody id="adminUserList"></tbody></table></div>
+            </div>
+        </div>
     </div>
 
     <!-- Login -->
-    <section id="landing-screen" class="fixed inset-0 z-[3000] flex items-center justify-center bg-[#020617]">
-        <div class="p-8 text-center bg-white/5 backdrop-blur-2xl rounded-[40px] border border-white/10 w-[90%] max-w-sm shadow-2xl">
+    <section id="landing-screen" class="fixed inset-0 z-[3000] flex items-center justify-center bg-[#020617] no-print">
+        <div class="p-8 text-center bg-white/5 backdrop-blur-xl rounded-[40px] border border-white/10 w-[90%] max-w-sm">
             <img src="https://github.com/ttv4u1/KP/raw/main/Logo%20Penguatkuasa.png" class="h-16 mx-auto mb-6">
-            <h1 class="text-2xl font-black text-white mb-2 uppercase tracking-tighter">e-Penguatkuasa <span class="version-box">v2.1</span></h1>
-            <button onclick="loginGoogle()" class="w-full bg-white text-slate-900 font-black py-4 rounded-2xl shadow-2xl flex items-center justify-center gap-3 active:scale-95 transition mt-8 uppercase text-sm">
-                AKSES SISTEM
-            </button>
+            <h1 class="text-2xl font-black text-white mb-2 uppercase italic tracking-tighter">e-Penguatkuasa <span class="version-box">v92</span></h1>
+            <button onclick="loginGoogle()" class="w-full bg-white text-slate-900 font-black py-4 rounded-2xl shadow-2xl uppercase text-sm mt-8">Masuk Sistem</button>
         </div>
     </section>
 
-    <!-- App Content -->
-    <div id="app-content" class="hidden opacity-0 transition-opacity duration-700 min-h-screen">
-        
-        <header class="sticky top-0 z-40 bg-white/80 backdrop-blur-md border-b border-slate-200 no-print shadow-sm">
-            <div class="w-full px-4 py-3 flex flex-col gap-3 sm:flex-row sm:justify-between sm:items-center">
-                <div class="flex items-center gap-3">
-                    <img src="https://github.com/ttv4u1/KP/raw/main/Logo%20Penguatkuasa.png" class="h-8 sm:h-10">
-                    <div>
-                        <h2 class="text-base sm:text-lg font-black text-slate-800 uppercase leading-none">Borang <span class="version-box">v2.1</span></h2>
-                        <p id="realtime-clock" class="text-[9px] sm:text-[10px] font-bold text-indigo-600 mt-1 uppercase"></p>
-                    </div>
-                </div>
-                <div class="flex flex-wrap items-center gap-1 sm:gap-2 justify-between w-full sm:w-auto">
-                    <button onclick="resetForm()" class="btn-action px-3 py-2 bg-indigo-600 text-white rounded-xl font-black uppercase shadow-sm">Baru</button>
-                    <button onclick="toggleHistory()" class="btn-action px-3 py-2 bg-amber-500 text-slate-900 rounded-xl font-black uppercase shadow-sm">Rekod</button>
-                    <button onclick="exportToExcel()" class="btn-action px-3 py-2 bg-emerald-600 text-white rounded-xl font-black uppercase shadow-sm">Excel</button>
-                    <button onclick="exportToCSV()" class="btn-action px-3 py-2 bg-blue-600 text-white rounded-xl font-black uppercase shadow-sm">Access</button>
-                    <button onclick="printReport()" class="btn-action px-3 py-2 bg-slate-900 text-white rounded-xl font-black uppercase shadow-sm">Cetak</button>
-                    <button onclick="toggleProfile()" class="ml-1 p-1 bg-slate-100 rounded-full border">
-                        <img id="navAvatar" src="" class="w-6 h-6 rounded-full object-cover">
-                    </button>
-                </div>
+    <!-- Main Content -->
+    <div id="app-content" class="hidden min-h-screen pb-10">
+        <header class="sticky top-0 z-40 bg-white/90 backdrop-blur-md border-b px-4 py-3 flex justify-between items-center no-print">
+            <div class="flex items-center gap-2">
+                <img src="https://github.com/ttv4u1/KP/raw/main/Logo%20Penguatkuasa.png" class="h-8">
+                <h2 class="font-black text-slate-800 text-xs uppercase italic leading-none">BORANG <span class="version-box">V92</span></h2>
+            </div>
+            <div class="flex items-center gap-1">
+                <button onclick="resetForm()" class="px-2 py-2 bg-indigo-600 text-white rounded-lg font-black text-[9px] uppercase">Baru</button>
+                <button onclick="toggleHistory()" class="px-2 py-2 bg-amber-500 text-white rounded-lg font-black text-[9px] uppercase">Rekod</button>
+                <button onclick="exportToExcel()" class="px-2 py-2 bg-emerald-600 text-white rounded-lg font-black text-[9px] uppercase">Excel</button>
+                <button onclick="exportToAccess()" class="px-2 py-2 bg-blue-600 text-white rounded-lg font-black text-[9px] uppercase">Access</button>
+                <button onclick="window.print()" class="px-2 py-2 bg-slate-900 text-white rounded-lg font-black text-[9px] uppercase">Cetak</button>
+                <div onclick="toggleProfile()" class="w-8 h-8 rounded-full border-2 border-indigo-500 overflow-hidden cursor-pointer shadow-sm"><img id="navAvatar" src="" class="w-full h-full object-cover"></div>
             </div>
         </header>
 
-        <!-- Main Form -->
-        <main class="w-full px-4 sm:px-6 py-6 mx-auto max-w-7xl">
+        <main class="p-4 max-w-7xl mx-auto">
             <form id="mainForm">
-                <input type="hidden" id="currentDocId" value="">
-
-                <!-- Section A -->
-                <h3 class="print-section-title">A. Maklumat Pengurusan & Kejadian</h3>
+                <!-- A. MAKLUMAT KES -->
                 <div class="section-card">
-                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-4">
-                        <div><label class="input-label">1. Bil</label><input type="text" name="BIL" class="form-input-modern uppercase" placeholder="CONTOH: 001/2026"></div>
-                        <div><label class="input-label">2. Tahun</label><input type="number" name="TAHUN" id="f_tahun" class="form-input-modern" placeholder="2026"></div>
-                        <div><label class="input-label">3. Bulan</label>
-                            <select name="BULAN" id="f_bulan" class="form-input-modern">
-                                <option>JANUARI</option><option>FEBRUARI</option><option>MAC</option><option>APRIL</option>
-                                <option>MEI</option><option>JUN</option><option>JULAI</option><option>OGOS</option>
-                                <option>SEPTEMBER</option><option>OKTOBER</option><option>NOVEMBER</option><option>DISEMBER</option>
-                            </select>
-                        </div>
-                        <div class="sm:col-span-2 lg:col-span-3"><label class="input-label">4. Pegawai Penguatkuasa</label><input type="text" id="form_staff" name="PENGUATKUASA" class="form-input-modern bg-slate-50 uppercase" readonly></div>
-                        <div class="sm:col-span-1 lg:col-span-2"><label class="input-label">5. Kategori Kes</label><input type="text" name="KATEGORI_KES" class="form-input-modern uppercase" placeholder="CONTOH: IMPORT HARAM"></div>
-                        <div class="sm:col-span-1 lg:col-span-2"><label class="input-label">6. No Repot Polis</label><input type="text" name="NO_REPOT_POLIS" class="form-input-modern uppercase" placeholder="CONTOH: RPT/123/26"></div>
-                        <div class="sm:col-span-1 lg:col-span-2"><label class="input-label">7. Tarikh Kejadian</label><input type="date" name="TARIKH_KEJADIAN" class="form-input-modern"></div>
-                        <div class="sm:col-span-1 lg:col-span-2"><label class="input-label">8. Masa Kejadian</label><input type="time" name="MASA_KEJADIAN" class="form-input-modern"></div>
-                        <div class="sm:col-span-2 lg:col-span-4"><label class="input-label">9. Lokasi Kejadian</label><input type="text" name="LOKASI_KEJADIAN" class="form-input-modern uppercase" placeholder="LOKASI PENUH"></div>
-                        <div class="sm:col-span-2 lg:col-span-4"><label class="input-label">10. Kesalahan</label><input type="text" name="KESALAHAN" class="form-input-modern uppercase"></div>
-                        <div class="sm:col-span-2 lg:col-span-5"><label class="input-label">11. Undang-Undang</label><input type="text" name="UNDANG_UNDANG" class="form-input-modern uppercase"></div>
-                        <div class="sm:col-span-1 lg:col-span-3"><label class="input-label">12. No Kes IP</label><input type="text" name="NO_KES_IP" class="form-input-modern uppercase"></div>
-                        <div class="sm:col-span-1 lg:col-span-3"><label class="input-label">13. Jenis Rampasan</label><input type="text" name="JENIS_RAMPASAN" class="form-input-modern uppercase"></div>
+                    <h3 class="text-[11px] font-black text-indigo-600 mb-5 uppercase tracking-widest">A. Maklumat Kes & Kejadian</h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-6 gap-4">
+                        <div><label class="input-label">BIL</label><input type="text" name="BIL" class="form-input-modern uppercase" placeholder="001/2026"></div>
+                        <div><label class="input-label">TAHUN</label><input type="number" name="TAHUN" id="f_tahun" class="form-input-modern" value="2026"></div>
+                        <div><label class="input-label">BULAN</label><select name="BULAN" id="f_bulan" class="form-input-modern"><option>JANUARI</option><option>FEBRUARI</option><option>MAC</option><option>APRIL</option><option>MEI</option><option>JUN</option><option>JULAI</option><option>OGOS</option><option>SEPTEMBER</option><option>OKTOBER</option><option>NOVEMBER</option><option>DISEMBER</option></select></div>
+                        <div class="sm:col-span-2 lg:col-span-3"><label class="input-label">Pegawai Penguatkuasa</label><input type="text" id="form_staff" name="PENGUATKUASA" class="form-input-modern bg-slate-50 uppercase" readonly></div>
+                        <div class="sm:col-span-2"><label class="input-label">Kategori Kes</label><input type="text" name="KATEGORI_KES" class="form-input-modern uppercase"></div>
+                        <div class="sm:col-span-2"><label class="input-label">No Repot Polis</label><input type="text" name="NO_REPOT_POLIS" class="form-input-modern uppercase"></div>
+                        <div><label class="input-label">Tarikh Kejadian</label><input type="date" name="TARIKH_KEJADIAN" class="form-input-modern"></div>
+                        <div><label class="input-label">Masa Kejadian</label><input type="time" name="MASA_KEJADIAN" class="form-input-modern"></div>
+                        <div class="sm:col-span-2 lg:col-span-3"><label class="input-label">Lokasi Kejadian</label><input type="text" name="LOKASI_KEJADIAN" class="form-input-modern uppercase"></div>
+                        <div class="sm:col-span-2 lg:col-span-3"><label class="input-label">Kesalahan</label><input type="text" name="KESALAHAN" class="form-input-modern uppercase"></div>
+                        <div class="sm:col-span-2 lg:col-span-4"><label class="input-label">Undang-Undang</label><input type="text" name="UNDANG_UNDANG" class="form-input-modern uppercase"></div>
+                        <div class="sm:col-span-1 lg:col-span-2"><label class="input-label">No Kes IP</label><input type="text" name="NO_KES_IP" class="form-input-modern uppercase"></div>
+                        <div class="sm:col-span-2"><label class="input-label">Jenis Rampasan</label><input type="text" name="JENIS_RAMPASAN" class="form-input-modern uppercase"></div>
                     </div>
                 </div>
 
-                <!-- Section B, C, D (Sama seperti sebelumnya) -->
-                <!-- ... Dipendekkan untuk fokus pada fungsi Admin baru ... -->
-                <!-- Section D Ringkasan -->
-                <div class="section-card border-l-[12px] border-indigo-600 print:border-l-0">
-                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
-                        <div><label class="input-label">38. Nilai Ekor/KG</label><input type="number" name="ANGGARAN_NILAI_EKOR_KG" class="calc form-input-modern" value="0"></div>
-                        <div><label class="input-label">39. Nilai Kenderaan</label><input type="number" name="ANGGARAN_NILAI_KENDERAAN" class="calc form-input-modern" value="0"></div>
-                        <div><label class="input-label">40. Nilai Kontena</label><input type="number" name="ANGGARAN_NILAI_PENGANGKUT_KONTENA" class="calc form-input-modern" value="0"></div>
-                        <div><label class="input-label">41. Nilai Lain</label><input type="number" name="ANGGARAN_NILAI_LAIN_LAIN" class="calc form-input-modern" value="0"></div>
+                <!-- B. HAIWAN HIDUP -->
+                <div class="section-card">
+                    <h3 class="text-[11px] font-black text-emerald-600 mb-5 uppercase tracking-widest">B. Rampasan Haiwan Hidup (Ekor)</h3>
+                    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 lg:grid-cols-6 gap-4">
+                        <div><label class="input-label">LEMBU</label><input type="number" name="LEMBU" class="calc-qty form-input-modern" value="0"></div>
+                        <div><label class="input-label">KERBAU</label><input type="number" name="KERBAU" class="calc-qty form-input-modern" value="0"></div>
+                        <div><label class="input-label">KAMBING</label><input type="number" name="KAMBING" class="calc-qty form-input-modern" value="0"></div>
+                        <div><label class="input-label">BEBIRI</label><input type="number" name="BEBIRI" class="calc-qty form-input-modern" value="0"></div>
+                        <div><label class="input-label">BABI</label><input type="number" name="BABI" class="calc-qty form-input-modern" value="0"></div>
+                        <div><label class="input-label">AYAM</label><input type="number" name="AYAM" class="calc-qty form-input-modern" value="0"></div>
+                        <div><label class="input-label">ANJING</label><input type="number" name="ANJING" class="calc-qty form-input-modern" value="0"></div>
+                        <div><label class="input-label">KUCING</label><input type="number" name="KUCING" class="calc-qty form-input-modern" value="0"></div>
+                        <div><label class="input-label">ARNAB</label><input type="number" name="ARNAB" class="calc-qty form-input-modern" value="0"></div>
+                        <div><label class="input-label">BURUNG</label><input type="number" name="BURUNG" class="calc-qty form-input-modern" value="0"></div>
+                        <div><label class="input-label">HAMSTER</label><input type="number" name="HAMSTER" class="calc-qty form-input-modern" value="0"></div>
                     </div>
-                    <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 mt-6">
-                        <div class="lg:col-span-6">
-                            <label class="input-label">42. Jumlah Nilai (RM)</label>
-                            <input type="text" id="total_val_web" readonly name="JUMLAH_NILAI_KESELURUHAN" class="form-input-modern font-black text-2xl border-none outline-none bg-transparent" value="RM 0.00">
-                        </div>
+                </div>
+
+                <!-- C. KARKAS & PRODUK -->
+                <div class="section-card">
+                    <h3 class="text-[11px] font-black text-amber-600 mb-5 uppercase tracking-widest">C. Karkas & Produk</h3>
+                    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+                        <div><label class="input-label">KARKAS LEMBU</label><input type="number" name="KARKAS_LEMBU" class="calc-qty form-input-modern" value="0"></div>
+                        <div><label class="input-label">KARKAS KERBAU</label><input type="number" name="KARKAS_KERBAU" class="calc-qty form-input-modern" value="0"></div>
+                        <div><label class="input-label">KARKAS KAMBING</label><input type="number" name="KARKAS_KAMBING" class="calc-qty form-input-modern" value="0"></div>
+                        <div><label class="input-label">KARKAS BABI</label><input type="number" name="KARKAS_BABI" class="calc-qty form-input-modern" value="0"></div>
+                        <div><label class="input-label">KARKAS AYAM</label><input type="number" name="KARKAS_AYAM" class="calc-qty form-input-modern" value="0"></div>
+                        <div><label class="input-label">K. BABI (FROZEN)</label><input type="number" name="KARKAS_BABI_SEJUK_BEKU" class="calc-qty form-input-modern" value="0"></div>
+                        <div><label class="input-label">ITIK (FROZEN)</label><input type="number" name="PRODUK_SEJUK_BEKU_ITIK" class="calc-qty form-input-modern" value="0"></div>
+                        <div><label class="input-label">BABI (FROZEN)</label><input type="number" name="PRODUK_SEJUK_BEKU_BABI" class="calc-qty form-input-modern" value="0"></div>
+                        <div><label class="input-label">BEBIRI (FROZEN)</label><input type="number" name="PRODUK_SEJUK_BEKU_BEBIRI" class="calc-qty form-input-modern" value="0"></div>
+                        <div><label class="input-label">PRODUK TIN</label><input type="number" name="PRODUK_HAIWAN_TIN" class="calc-qty form-input-modern" value="0"></div>
+                        <div class="col-span-2"><label class="input-label">Lain-lain Rampasan</label><input type="text" name="RAMPASAN_LAIN" class="form-input-modern uppercase"></div>
                     </div>
-                    <div class="mt-8 no-print flex justify-center">
-                        <button type="button" onclick="saveToAll()" class="w-full sm:w-auto px-12 py-5 bg-indigo-600 text-white rounded-2xl font-black uppercase shadow-xl hover:bg-indigo-700 transition active:scale-95">Simpan Rekod v2.1</button>
+                </div>
+
+                <!-- D. NILAI & RINGKASAN -->
+                <div class="section-card border-l-[12px] border-indigo-600">
+                    <h3 class="text-[11px] font-black text-slate-800 mb-5 uppercase tracking-widest">D. Ringkasan & Nilai</h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                        <div class="sm:col-span-2"><label class="input-label">JUMLAH RAMPASAN</label><input type="text" id="disp_qty" name="JUMLAH_RAMPASAN" class="form-input-modern bg-indigo-50 font-black text-indigo-700" readonly value="0"></div>
+                        <div class="sm:col-span-2"><label class="input-label">PENGANGKUTAN (NO PLAT)</label><input type="text" name="RAMPASAN_PENGANGKUTAN" class="form-input-modern uppercase"></div>
+                        <div><label class="input-label">NILAI EKOR/KG (RM)</label><input type="number" name="ANGGARAN_NILAI_EKOR_KG" class="calc-rm form-input-modern" value="0"></div>
+                        <div><label class="input-label">NILAI KENDERAAN (RM)</label><input type="number" name="ANGGARAN_NILAI_KENDERAAN" class="calc-rm form-input-modern" value="0"></div>
+                        <div><label class="input-label">NILAI KONTENA (RM)</label><input type="number" name="ANGGARAN_NILAI_PENGANGKUT_KONTENA" class="calc-rm form-input-modern" value="0"></div>
+                        <div><label class="input-label">NILAI LAIN-LAIN (RM)</label><input type="number" name="ANGGARAN_NILAI_LAIN_LAIN" class="calc-rm form-input-modern" value="0"></div>
+                        <div class="sm:col-span-2"><label class="input-label">TOTAL KESELURUHAN (RM)</label><input type="text" id="disp_rm" name="JUMLAH_NILAI_KESELURUHAN" class="form-input-modern text-3xl font-black text-indigo-700 bg-transparent border-none outline-none" readonly value="RM 0.00"></div>
+                        <div class="sm:col-span-2"><label class="input-label">KES SERAHAN</label><input type="text" name="KES_SERAHAN" class="form-input-modern uppercase"></div>
+                        <div class="sm:col-span-4"><label class="input-label">CATATAN</label><input type="text" name="CATATAN" class="form-input-modern uppercase"></div>
                     </div>
+                    <button type="button" onclick="submitData()" class="no-print w-full bg-indigo-600 text-white font-black py-5 rounded-2xl shadow-xl hover:bg-indigo-700 transition active:scale-95 uppercase tracking-widest text-sm mt-8">Hantar & Simpan Rekod v92</button>
                 </div>
             </form>
         </main>
     </div>
 
-    <!-- DB SIDEBAR -->
-    <aside id="historySidebar" class="fixed top-0 left-[-100%] w-full max-w-lg h-full bg-slate-50 z-[2500] shadow-2xl transition-all duration-500 overflow-y-auto no-print p-6">
-        <div class="flex justify-between items-center mb-6">
-            <h2 class="font-black text-xl uppercase tracking-tighter">Database <span class="version-box">v2.1</span></h2>
-            <button onclick="toggleHistory()" class="p-2 bg-white rounded-full border shadow-sm"><i data-lucide="x"></i></button>
-        </div>
-        <div id="historyList" class="space-y-4"></div>
+    <!-- Database Sidebar -->
+    <aside id="historySidebar" class="fixed top-0 left-[-100%] w-full max-w-md h-full bg-white z-[2500] shadow-2xl transition-all duration-500 overflow-y-auto no-print">
+        <div class="sticky top-0 bg-white p-6 border-b flex justify-between items-center"><h2 class="font-black text-xl uppercase italic">Database <span class="text-indigo-600">Rekod</span></h2><button onclick="toggleHistory()" class="p-2 bg-slate-100 rounded-full"><i data-lucide="x"></i></button></div>
+        <div id="historyList" class="p-4 space-y-3"></div>
     </aside>
 
-    <!-- PROFILE SIDEBAR -->
-    <aside id="profileSidebar" class="fixed top-0 right-[-100%] w-full max-w-sm h-full bg-white z-[2500] shadow-2xl transition-all duration-500 p-8 no-print border-l">
-        <div class="flex justify-between items-center mb-8">
-            <h2 class="font-black text-xl uppercase tracking-tighter">Profil Pegawai</h2>
-            <button onclick="toggleProfile()"><i data-lucide="x"></i></button>
-        </div>
-        <div class="text-center mb-6">
-            <div id="adminBadge" class="hidden inline-block bg-red-600 text-white text-[10px] font-black px-4 py-1 rounded-full uppercase mb-2">SUPER ADMIN</div>
-        </div>
+    <!-- Profile Sidebar -->
+    <aside id="profileSidebar" class="fixed top-0 right-[-100%] w-full max-w-sm h-full bg-white z-[2500] shadow-2xl transition-all duration-500 p-8 no-print">
+        <div class="flex justify-between items-center mb-8"><h2 class="font-black text-xl uppercase italic">Profil Pegawai</h2><button onclick="toggleProfile()"><i data-lucide="x"></i></button></div>
         <div class="space-y-4">
-            <div><label class="input-label">Nama Penuh</label><input type="text" id="userName" class="form-input-modern uppercase"></div>
-            <div><label class="input-label">Gred Jabatan</label><input type="text" id="userGred" class="form-input-modern uppercase"></div>
-            <div><label class="input-label">Negeri / Cawangan</label><input type="text" id="userCawangan" class="form-input-modern uppercase"></div>
-            <button onclick="saveProfile()" class="w-full bg-indigo-600 text-white font-black py-4 rounded-2xl uppercase shadow-lg hover:bg-indigo-700 transition">Kemaskini Profil</button>
-            <div id="adminControls" class="hidden space-y-4 mt-6">
-                <button onclick="openAdminPanel()" class="premium-gold-btn w-full font-black py-4 rounded-2xl uppercase shadow-lg flex items-center justify-center gap-3 text-sm">
-                    <i data-lucide="crown"></i> PANEL KAWALAN SUPER ADMIN
-                </button>
-            </div>
-            <button onclick="logout()" class="w-full text-red-500 font-bold text-xs uppercase mt-4">Log Keluar</button>
+            <div id="adminBadge" class="hidden bg-red-600 text-white text-[10px] font-black px-4 py-1.5 rounded-full uppercase tracking-widest mb-4">SUPER ADMIN</div>
+            <div><label class="input-label">Nama Penuh</label><input type="text" id="p_name" class="form-input-modern uppercase"></div>
+            <div><label class="input-label">Gred Jawatan</label><input type="text" id="p_gred" class="form-input-modern uppercase"></div>
+            <div><label class="input-label">Cawangan/Negeri</label><input type="text" id="p_caw" class="form-input-modern uppercase"></div>
+            <button onclick="saveProfile()" class="w-full bg-indigo-600 text-white font-black py-4 rounded-xl uppercase shadow-md">Update Profil</button>
+            <div id="adminControls" class="hidden pt-6 border-t mt-6"><button onclick="openAdminPanel()" class="premium-gold-btn w-full py-4 rounded-xl uppercase flex items-center justify-center gap-3"><i data-lucide="crown" class="w-4 h-4"></i> Admin Panel</button></div>
+            <button onclick="logout()" class="w-full text-red-500 font-bold text-xs uppercase mt-8 text-center">LOG KELUAR</button>
         </div>
     </aside>
-
-    <!-- MODAL PANEL ADMIN (UPDATED WITH USER MANAGEMENT) -->
-    <div id="adminModal" class="fixed inset-0 bg-slate-900/90 z-[3000] hidden flex items-center justify-center p-4">
-        <div class="bg-white w-full max-w-3xl rounded-[32px] max-h-[90vh] flex flex-col overflow-hidden">
-            <div class="p-8 border-b flex justify-between items-center">
-                <h2 class="text-2xl font-black uppercase italic text-slate-800">Admin Control Panel</h2>
-                <button onclick="closeAdminPanel()"><i data-lucide="x"></i></button>
-            </div>
-            
-            <div class="flex-1 overflow-y-auto p-8">
-                <!-- Stat Cards -->
-                <div class="grid grid-cols-2 gap-4 mb-8">
-                    <div class="bg-indigo-50 p-6 rounded-2xl">
-                        <p class="text-xs font-bold text-indigo-600 uppercase">Total Kes (Semua)</p>
-                        <h3 id="statTotalKes" class="text-3xl font-black text-indigo-900">0</h3>
-                    </div>
-                    <div class="bg-emerald-50 p-6 rounded-2xl">
-                        <p class="text-xs font-bold text-emerald-600 uppercase">Total Nilai (RM)</p>
-                        <h3 id="statTotalRM" class="text-2xl font-black text-emerald-900">RM 0</h3>
-                    </div>
-                </div>
-
-                <!-- User Management Section -->
-                <div class="mt-8">
-                    <h4 class="text-xs font-black uppercase text-slate-400 mb-4 flex items-center gap-2">
-                        <i data-lucide="users" class="w-4 h-4"></i> Pengurusan Pengguna & Peranan
-                    </h4>
-                    <div class="bg-slate-50 rounded-2xl border border-slate-200 overflow-hidden">
-                        <table class="w-full text-left text-sm">
-                            <thead class="bg-slate-100 text-[10px] font-black uppercase text-slate-500">
-                                <tr>
-                                    <th class="px-4 py-3">Pegawai</th>
-                                    <th class="px-4 py-3">Peranan</th>
-                                    <th class="px-4 py-3 text-right">Tindakan</th>
-                                </tr>
-                            </thead>
-                            <tbody id="userManagementList">
-                                <!-- Users will be loaded here -->
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
 
     <script>
-        // --- KONFIGURASI (Sama seperti kod anda) ---
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxYZYxkvYipLPvvdk_j8Srprz_ioCAtmkibQLtadnOZkbRZ3L2j-4SFk1sCpqH9M-qmEw/exec'; 
         const BASEROW_TOKEN = '7OPuNqPLqPtdkykdydfGSHaXReA00BQU';
         const BASEROW_TABLE_ID = '947317';
+
         const firebaseConfig = {
             apiKey: "AIzaSyD5rx8TQdkFLzmunEmVtwt56Y8Mlt9Zsvo",
             authDomain: "e-penguatkuasa-jpv.firebaseapp.com",
@@ -307,153 +200,205 @@
             messagingSenderId: "790915728070",
             appId: "1:790915728070:web:d2759cc670024001218dc7"
         };
-
         if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
         lucide.createIcons();
+        let userRole = 'USER';
 
-        let userMeta = { name: '', gred: '', cawangan: '', role: 'USER' };
-
-        // --- SISTEM LOGIN & PROFILE ---
-        async function loginGoogle() {
-            const provider = new firebase.auth.GoogleAuthProvider();
-            document.getElementById('loader').style.display = 'flex';
-            try { await firebase.auth().signInWithPopup(provider); } 
-            catch (e) { await firebase.auth().signInWithRedirect(provider); }
-            finally { document.getElementById('loader').style.display = 'none'; }
-        }
-
-        firebase.auth().onAuthStateChanged(async (user) => {
-            const landing = document.getElementById('landing-screen');
-            const app = document.getElementById('app-content');
+        // --- AUTH ---
+        firebase.auth().onAuthStateChanged(async user => {
             if (user) {
-                landing.style.display = 'none'; app.classList.remove('hidden'); app.style.opacity = "1";
+                document.getElementById('landing-screen').style.display = 'none';
+                document.getElementById('app-content').classList.remove('hidden');
+                if(user.email === 'ttv4u1@gmail.com') userRole = 'ADMIN';
                 await loadProfile(user);
-                updateClock();
-            } else { landing.style.display = 'flex'; app.classList.add('hidden'); }
+            } else { document.getElementById('landing-screen').style.display = 'flex'; }
         });
+
+        async function loginGoogle() { const provider = new firebase.auth.GoogleAuthProvider(); await firebase.auth().signInWithPopup(provider); }
 
         async function loadProfile(user) {
-            try {
-                const doc = await db.collection("users").doc(user.uid).get();
-                const d = doc.exists ? doc.data() : {};
-                
-                // Super Admin Check (Email anda atau role ADMIN)
-                const isAdmin = (d.role === 'ADMIN' || user.email === 'ttv4u1@gmail.com');
-                
-                userMeta = { 
-                    name: d.name || '', gred: d.gred || '', cawangan: d.cawangan || '',
-                    role: isAdmin ? 'ADMIN' : 'USER' 
-                };
-
-                document.getElementById('adminBadge').classList.toggle('hidden', !isAdmin);
-                document.getElementById('adminControls').classList.toggle('hidden', !isAdmin);
-                document.getElementById('navAvatar').src = user.photoURL || `https://ui-avatars.com/api/?name=P`;
-                document.getElementById('userName').value = userMeta.name;
-                document.getElementById('userGred').value = userMeta.gred;
-                document.getElementById('userCawangan').value = userMeta.cawangan;
-                if(userMeta.name) document.getElementById('form_staff').value = `${userMeta.name} (${userMeta.gred}) / ${userMeta.cawangan}`.toUpperCase();
-            } catch (e) { console.error(e); }
-        }
-
-        // --- ADMIN FUNCTIONS ---
-        async function openAdminPanel() {
-            document.getElementById('adminModal').classList.remove('hidden');
-            
-            // 1. Ambil Stats
-            const reports = await db.collection("reports").get();
-            let totalRM = 0;
-            reports.forEach(doc => {
-                const val = doc.data().JUMLAH_NILAI_KESELURUHAN || "0";
-                totalRM += Number(val.replace(/[^0-9.-]+/g,""));
-            });
-            document.getElementById('statTotalKes').innerText = reports.size;
-            document.getElementById('statTotalRM').innerText = "RM " + totalRM.toLocaleString();
-
-            // 2. Ambil Senarai Pengguna
-            fetchUsersList();
-        }
-
-        async function fetchUsersList() {
-    const listContainer = document.getElementById('userManagementList');
-    listContainer.innerHTML = '<tr><td colspan="3" class="p-4 text-center animate-pulse">Memuatkan senarai...</td></tr>';
-    
-    try {
-        // Tambah timeout atau catch error untuk kesan masalah permission
-        const usersSnapshot = await db.collection("users").get().catch(err => {
-            throw new Error(err.message);
-        });
-
-        if (usersSnapshot.empty) {
-            listContainer.innerHTML = '<tr><td colspan="3" class="p-4 text-center text-slate-500 italic">Tiada pengguna dijumpai dalam pangkalan data.</td></tr>';
-            return;
-        }
-
-        listContainer.innerHTML = '';
-
-        usersSnapshot.forEach(doc => {
-            const u = doc.data();
-            const uid = doc.id;
-            const isUserAdmin = u.role === 'ADMIN';
-
-            const row = document.createElement('tr');
-            row.className = "border-b border-slate-100 hover:bg-slate-50 transition";
-            row.innerHTML = `
-                <td class="px-4 py-4">
-                    <div class="font-bold text-slate-800 uppercase text-xs">${u.name || 'PENGGUNA BARU'}</div>
-                    <div class="text-[9px] text-slate-500 uppercase">${u.gred || '-'} | ${u.cawangan || '-'}</div>
-                </td>
-                <td class="px-4 py-4">
-                    <span class="px-2 py-1 rounded text-[9px] font-black ${isUserAdmin ? 'bg-amber-100 text-amber-700' : 'bg-slate-100 text-slate-600'}">
-                        ${u.role || 'USER'}
-                    </span>
-                </td>
-                <td class="px-4 py-4 text-right">
-                    <button onclick="toggleRole('${uid}', '${u.role || 'USER'}')" class="text-[10px] font-black px-3 py-1.5 rounded-lg border transition ${isUserAdmin ? 'bg-white text-red-500 border-red-200 hover:bg-red-50' : 'bg-indigo-600 text-white border-indigo-600 hover:bg-indigo-700'}">
-                        ${isUserAdmin ? 'JADIKAN USER' : 'JADIKAN ADMIN'}
-                    </button>
-                </td>
-            `;
-            listContainer.appendChild(row);
-        });
-    } catch (e) {
-        console.error("Ralat fetchUsersList:", e);
-        listContainer.innerHTML = `<tr><td colspan="3" class="p-4 text-center text-red-500 font-bold uppercase text-[10px]">Gagal Memuatkan: ${e.message}</td></tr>`;
-    }
-}
-
-        async function toggleRole(uid, currentRole) {
-            const newRole = (currentRole === 'ADMIN') ? 'USER' : 'ADMIN';
-            if(!confirm(`Tukar peranan pengguna ini kepada ${newRole}?`)) return;
-
-            try {
-                await db.collection("users").doc(uid).update({ role: newRole });
-                alert("Peranan berjaya dikemaskini!");
-                fetchUsersList(); // Refresh list
-            } catch (e) {
-                alert("Gagal mengemaskini: " + e.message);
+            const doc = await db.collection("users").doc(user.uid).get();
+            const d = doc.data() || {};
+            if(d.role === 'ADMIN' || userRole === 'ADMIN') {
+                userRole = 'ADMIN';
+                document.getElementById('adminBadge').classList.remove('hidden');
+                document.getElementById('adminControls').classList.remove('hidden');
             }
+            document.getElementById('navAvatar').src = user.photoURL || '';
+            document.getElementById('p_name').value = d.name || '';
+            document.getElementById('p_gred').value = d.gred || '';
+            document.getElementById('p_caw').value = d.cawangan || '';
+            if(d.name) document.getElementById('form_staff').value = `${d.name} (${d.gred}) / ${d.cawangan}`.toUpperCase();
         }
 
-        function closeAdminPanel() { document.getElementById('adminModal').classList.add('hidden'); }
+        // --- CALCULATIONS ---
+        document.addEventListener('input', e => {
+            if(e.target.classList.contains('calc-qty')) {
+                let total = 0; document.querySelectorAll('.calc-qty').forEach(i => total += Number(i.value || 0));
+                document.getElementById('disp_qty').value = total;
+            }
+            if(e.target.classList.contains('calc-rm')) {
+                let rm = 0; document.querySelectorAll('.calc-rm').forEach(i => rm += Number(i.value || 0));
+                document.getElementById('disp_rm').value = "RM " + rm.toLocaleString('en-US', {minimumFractionDigits:2});
+            }
+        });
 
-        // --- UTILS (Sama seperti kod anda) ---
-        function updateClock() {
-            const now = new Date();
-            document.getElementById('realtime-clock').innerText = now.toLocaleString('ms-MY', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' }).toUpperCase();
+        // --- EXPORT FUNCTIONS (EXCEL & ACCESS) ---
+        async function exportToExcel() {
+            const loader = document.getElementById('loader');
+            loader.style.display = 'flex';
+            try {
+                let q = db.collection("reports");
+                if(userRole !== 'ADMIN') q = q.where("userID", "==", firebase.auth().currentUser.uid);
+                const snap = await q.get();
+                const data = snap.docs.map(doc => doc.data());
+                
+                const worksheet = XLSX.utils.json_to_sheet(data);
+                const workbook = XLSX.utils.book_new();
+                XLSX.utils.book_append_sheet(workbook, worksheet, "Rekod Kes");
+                XLSX.writeFile(workbook, `Rekod_Kes_${new Date().toLocaleDateString()}.xlsx`);
+            } catch (e) { alert("Ralat Excel: " + e.message); }
+            finally { loader.style.display = 'none'; }
         }
-        setInterval(updateClock, 1000);
+
+        async function exportToAccess() {
+            const loader = document.getElementById('loader');
+            loader.style.display = 'flex';
+            try {
+                let q = db.collection("reports");
+                if(userRole !== 'ADMIN') q = q.where("userID", "==", firebase.auth().currentUser.uid);
+                const snap = await q.get();
+                const items = snap.docs.map(doc => doc.data());
+                
+                if (items.length === 0) { alert("Tiada data untuk dieksport"); return; }
+                
+                const replacer = (key, value) => value === null ? '' : value;
+                const header = Object.keys(items[0]);
+                const csv = [
+                    header.join(','),
+                    ...items.map(row => header.map(fieldName => JSON.stringify(row[fieldName], replacer)).join(','))
+                ].join('\r\n');
+
+                const blob = new Blob([csv], { type: 'text/csv' });
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.setAttribute('href', url);
+                a.setAttribute('download', `Eksport_Access_${new Date().getTime()}.csv`);
+                a.click();
+            } catch (e) { alert("Ralat CSV: " + e.message); }
+            finally { loader.style.display = 'none'; }
+        }
+
+        // --- SYNC & SUBMIT ---
+        async function saveToBaserow(data) {
+            try {
+                const baserowData = {
+                    "BIL": data.BIL, "TAHUN": Number(data.TAHUN) || 2026, "BULAN": data.BULAN,
+                    "PENGUATKUASA": data.PENGUATKUASA, "KATEGORI KES": data.KATEGORI_KES,
+                    "NO REPOT POLIS": data.NO_REPOT_POLIS, "TARIKH KEJADIAN": data.TARIKH_KEJADIAN,
+                    "MASA KEJADIAN": data.MASA_KEJADIAN, "LOKASI KEJADIAN": data.LOKASI_KEJADIAN,
+                    "KESALAHAN": data.KESALAHAN, "UNDANG-UNDANG": data.UNDANG_UNDANG,
+                    "NO KES IP": data.NO_KES_IP, "JENIS RAMPASAN": data.JENIS_RAMPASAN,
+                    "LEMBU": Number(data.LEMBU) || 0, "KERBAU": Number(data.KERBAU) || 0,
+                    "KAMBING": Number(data.KAMBING) || 0, "BEBIRI": Number(data.BEBIRI) || 0,
+                    "BABI": Number(data.BABI) || 0, "AYAM": Number(data.AYAM) || 0,
+                    "KARKAS LEMBU": Number(data.KARKAS_LEMBU) || 0, "KARKAS KERBAU": Number(data.KARKAS_KERBAU) || 0,
+                    "KARKAS KAMBING": Number(data.KARKAS_KAMBING) || 0, "KARKAS BABI": Number(data.KARKAS_BABI) || 0,
+                    "KARKAS BABI SEJUK BEKU": Number(data.KARKAS_BABI_SEJUK_BEKU) || 0,
+                    "KARKAS AYAM": Number(data.KARKAS_AYAM) || 0, "PRODUK SEJUK BEKU ITIK": Number(data.PRODUK_SEJUK_BEKU_ITIK) || 0,
+                    "PRODUK SEJUK BEKU BABI": Number(data.PRODUK_SEJUK_BEKU_BABI) || 0,
+                    "PRODUK SEJUK BEKU BEBIRI": Number(data.PRODUK_SEJUK_BEKU_BEBIRI) || 0,
+                    "PRODUK HAIWAN (TIN)": Number(data.PRODUK_HAIWAN_TIN) || 0, "ANJING": Number(data.ANJING) || 0,
+                    "KUCING": Number(data.KUCING) || 0, "ARNAB": Number(data.ARNAB) || 0,
+                    "BURUNG": Number(data.BURUNG) || 0, "HAMSTER": Number(data.HAMSTER) || 0,
+                    "RAMPASAN LAIN-LAIN": data.RAMPASAN_LAIN, "JUMLAH RAMPASAN": data.JUMLAH_RAMPASAN,
+                    "RAMPASAN PENGANGKUTAN": data.RAMPASAN_PENGANGKUTAN,
+                    "ANGGARAN NILAI (EKOR/KG)": Number(data.ANGGARAN_NILAI_EKOR_KG) || 0,
+                    "ANGGARAN NILAI (KENDERAAN)": Number(data.ANGGARAN_NILAI_KENDERAAN) || 0,
+                    "ANGGARAN NILAI (PENGANGKUT/KONTENA)": Number(data.ANGGARAN_NILAI_PENGANGKUT_KONTENA) || 0,
+                    "ANGGARAN NILAI (LAIN-LAIN)": Number(data.ANGGARAN_NILAI_LAIN_LAIN) || 0,
+                    "JUMLAH NILAI KESELURUHAN": data.JUMLAH_NILAI_KESELURUHAN,
+                    "KES SERAHAN": data.KES_SERAHAN, "CATATAN": data.CATATAN
+                };
+                const response = await fetch(`https://api.baserow.io/api/database/rows/table/${BASEROW_TABLE_ID}/?user_field_names=true`, {
+                    method: 'POST',
+                    headers: { 'Authorization': `Token ${BASEROW_TOKEN}`, 'Content-Type': 'application/json' },
+                    body: JSON.stringify(baserowData)
+                });
+                return response.ok;
+            } catch (err) { return false; }
+        }
+
+        async function submitData() {
+            const loader = document.getElementById('loader');
+            const status = document.getElementById('loader-status');
+            loader.style.display = 'flex';
+            const formData = new FormData(document.getElementById('mainForm'));
+            const data = Object.fromEntries(formData.entries());
+            data.userID = firebase.auth().currentUser.uid;
+            data.timestamp = firebase.firestore.FieldValue.serverTimestamp();
+            try {
+                status.innerText = "SINKRONISASI FIRESTORE...";
+                await db.collection("reports").add(data);
+                status.innerText = "SINKRONISASI SPREADSHEET...";
+                if(SCRIPT_URL.startsWith('http')) await fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(data) });
+                status.innerText = "SINKRONISASI BASEROW v92...";
+                await saveToBaserow(data);
+                alert("Data Berjaya Disimpan ke Semua Platform Cloud!");
+                resetForm();
+            } catch (e) { alert("Ralat: " + e.message); } 
+            finally { loader.style.display = 'none'; }
+        }
+
+        // --- UI UTILS ---
+        async function fetchHistory() {
+            const list = document.getElementById('historyList');
+            list.innerHTML = '<p class="text-center p-10 animate-pulse text-[10px]">MEMANGGIL DATABASE...</p>';
+            let q = db.collection("reports");
+            if(userRole !== 'ADMIN') q = q.where("userID", "==", firebase.auth().currentUser.uid);
+            const snap = await q.get();
+            list.innerHTML = '';
+            snap.forEach(doc => {
+                const d = doc.data();
+                const card = document.createElement('div');
+                card.className = "bg-slate-50 p-4 rounded-2xl border border-slate-200 shadow-sm hover:border-indigo-500 transition cursor-pointer active:scale-95";
+                card.onclick = () => {
+                    const form = document.getElementById('mainForm');
+                    Object.keys(d).forEach(key => { if(form.elements[key]) form.elements[key].value = d[key]; });
+                    toggleHistory();
+                };
+                card.innerHTML = `<div class="flex justify-between items-start"><div><p class="text-[9px] font-black text-indigo-600">${d.BIL || '-'}</p><p class="font-bold text-xs uppercase">${d.KATEGORI_KES || 'KES'}</p></div><p class="font-black text-xs text-emerald-600">${d.JUMLAH_NILAI_KESELURUHAN || 'RM 0'}</p></div>`;
+                list.appendChild(card);
+            });
+        }
+
+        function resetForm() { document.getElementById('mainForm').reset(); document.getElementById('f_tahun').value = 2026; document.getElementById('disp_rm').value = "RM 0.00"; loadProfile(firebase.auth().currentUser); }
         function toggleHistory() { const s = document.getElementById('historySidebar'); s.style.left = (s.style.left === '0px') ? '-100%' : '0px'; if(s.style.left === '0px') fetchHistory(); }
         function toggleProfile() { const s = document.getElementById('profileSidebar'); s.style.right = (s.style.right === '0px') ? '-100%' : '0px'; }
+        async function saveProfile() { await db.collection("users").doc(firebase.auth().currentUser.uid).set({ name: document.getElementById('p_name').value.toUpperCase(), gred: document.getElementById('p_gred').value.toUpperCase(), cawangan: document.getElementById('p_caw').value.toUpperCase(), role: userRole }, {merge:true}); alert("Profil dikemaskini!"); location.reload(); }
         function logout() { firebase.auth().signOut().then(() => location.reload()); }
-        async function saveProfile() {
-            const user = firebase.auth().currentUser;
-            const data = { name: document.getElementById('userName').value.toUpperCase(), gred: document.getElementById('userGred').value.toUpperCase(), cawangan: document.getElementById('userCawangan').value.toUpperCase() };
-            await db.collection("users").doc(user.uid).set(data, { merge: true });
-            alert("Profil dikemaskini!");
-            location.reload();
+        
+        async function openAdminPanel() {
+            document.getElementById('adminModal').classList.remove('hidden');
+            const rSnap = await db.collection("reports").get();
+            const uSnap = await db.collection("users").get();
+            let totalRM = 0;
+            rSnap.forEach(doc => { totalRM += Number((doc.data().JUMLAH_NILAI_KESELURUHAN || "0").replace(/[^0-9.-]+/g,"")); });
+            document.getElementById('statTotalKes').innerText = rSnap.size;
+            document.getElementById('statTotalRM').innerText = "RM " + totalRM.toLocaleString();
+            document.getElementById('statTotalUsers').innerText = uSnap.size;
+            const list = document.getElementById('adminUserList'); list.innerHTML = '';
+            uSnap.forEach(doc => {
+                const u = doc.data();
+                const row = document.createElement('tr');
+                row.className = "border-b";
+                row.innerHTML = `<td class="px-6 py-4 font-bold text-xs uppercase">${u.name || 'BARU'}</td><td class="px-6 py-4 text-right"><button onclick="toggleAdmin('${doc.id}','${u.role}')" class="bg-indigo-100 px-3 py-1 rounded text-[10px] font-black">${u.role === 'ADMIN' ? 'BUANG ADMIN' : 'LANTIK ADMIN'}</button></td>`;
+                list.appendChild(row);
+            });
         }
-        // ... (calcTotal, resetForm, dsb) ...
+        async function toggleAdmin(id, role) { await db.collection("users").doc(id).update({role: role === 'ADMIN' ? 'USER' : 'ADMIN'}); openAdminPanel(); }
+        function closeAdminPanel() { document.getElementById('adminModal').classList.add('hidden'); }
     </script>
 </body>
 </html>
