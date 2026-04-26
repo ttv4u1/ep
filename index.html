@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>e-Penguatkuasa v2.0 - Pro Edition</title>
+    <title>e-Penguatkuasa v2.1 - Pro Edition</title>
     
     <link rel="icon" type="image/png" href="https://github.com/ttv4u1/KP/raw/main/Logo%20Penguatkuasa.png">
     <script src="https://cdn.tailwindcss.com"></script>
@@ -45,7 +45,7 @@
     color: #000;
 }
 
-        /* v2.0 ANIMATED BOX */
+        /* v2.1 ANIMATED BOX */
         @keyframes goldShimmer {
     0% { background-position: -200% 0; }
     100% { background-position: 200% 0; }
@@ -103,7 +103,7 @@
             .btn-action { padding: 8px 6px !important; font-size: 8px !important; }
         }
 
-        /* PRINT OPTIMIZATION v2.0 */
+        /* PRINT OPTIMIZATION v2.1 */
         @media print {
             @page { size: A4 portrait; margin: 0.4cm; }
             body { background: white !important; font-size: 9pt !important; color: black !important; }
@@ -141,14 +141,14 @@
 
     <div id="loader">
         <div class="w-10 h-10 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin"></div>
-        <p class="mt-4 font-black text-indigo-600 uppercase text-xs">Memproses Data v2.0...</p>
+        <p class="mt-4 font-black text-indigo-600 uppercase text-xs">Memproses Data v2.1...</p>
     </div>
 
     <!-- Login -->
     <section id="landing-screen" class="fixed inset-0 z-[3000] flex items-center justify-center bg-[#020617]">
         <div class="p-8 text-center bg-white/5 backdrop-blur-2xl rounded-[40px] border border-white/10 w-[90%] max-w-sm shadow-2xl">
             <img src="https://github.com/ttv4u1/KP/raw/main/Logo%20Penguatkuasa.png" class="h-16 mx-auto mb-6">
-            <h1 class="text-2xl font-black text-white mb-2 uppercase tracking-tighter">e-Penguatkuasa <span class="version-box">v2.0</span></h1>
+            <h1 class="text-2xl font-black text-white mb-2 uppercase tracking-tighter">e-Penguatkuasa <span class="version-box">v2.1</span></h1>
             <button onclick="loginGoogle()" class="w-full bg-white text-slate-900 font-black py-4 rounded-2xl shadow-2xl flex items-center justify-center gap-3 active:scale-95 transition mt-8 uppercase text-sm">
                 AKSES SISTEM
             </button>
@@ -163,7 +163,7 @@
                 <div class="flex items-center gap-3">
                     <img src="https://github.com/ttv4u1/KP/raw/main/Logo%20Penguatkuasa.png" class="h-8 sm:h-10">
                     <div>
-                        <h2 class="text-base sm:text-lg font-black text-slate-800 uppercase leading-none">Borang <span class="version-box">v2.0</span></h2>
+                        <h2 class="text-base sm:text-lg font-black text-slate-800 uppercase leading-none">Borang <span class="version-box">v2.1</span></h2>
                         <p id="realtime-clock" class="text-[9px] sm:text-[10px] font-bold text-indigo-600 mt-1 uppercase"></p>
                     </div>
                 </div>
@@ -184,7 +184,7 @@
         <div id="print-header">
             <div class="header-top">
                 <img src="https://github.com/ttv4u1/KP/raw/main/Logo%20Penguatkuasa.png">
-                <h1>LAPORAN KES PENGUATKUASAAN VETERINAR (v2.0)</h1>
+                <h1>LAPORAN KES PENGUATKUASAAN VETERINAR (v2.1)</h1>
                 <div></div>
             </div>
             <div class="header-sub">
@@ -295,7 +295,7 @@
                     </div>
 
                     <div class="mt-8 no-print flex justify-center">
-                        <button type="button" onclick="saveToAll()" class="w-full sm:w-auto px-12 py-5 bg-indigo-600 text-white rounded-2xl font-black uppercase shadow-xl hover:bg-indigo-700 transition active:scale-95">Simpan Rekod v2.0</button>
+                        <button type="button" onclick="saveToAll()" class="w-full sm:w-auto px-12 py-5 bg-indigo-600 text-white rounded-2xl font-black uppercase shadow-xl hover:bg-indigo-700 transition active:scale-95">Simpan Rekod v2.1</button>
                     </div>
                 </div>
 
@@ -323,7 +323,7 @@
     <!-- DB SIDEBAR -->
     <aside id="historySidebar" class="fixed top-0 left-[-100%] w-full max-w-lg h-full bg-slate-50 z-[2500] shadow-2xl transition-all duration-500 overflow-y-auto no-print p-6">
         <div class="flex justify-between items-center mb-6">
-            <h2 class="font-black text-xl uppercase tracking-tighter">Database <span class="version-box">v2.0</span></h2>
+            <h2 class="font-black text-xl uppercase tracking-tighter">Database <span class="version-box">v2.1</span></h2>
             <button onclick="toggleHistory()" class="p-2 bg-white rounded-full border shadow-sm"><i data-lucide="x"></i></button>
         </div>
         <div id="historyList" class="space-y-4"></div>
@@ -431,30 +431,67 @@
     let userMeta = { name: '', gred: '', cawangan: '', role: 'USER' };
 
     // --- 2. SISTEM LOGIN & AUTH ---
-    function loginGoogle() {
-        const provider = new firebase.auth.GoogleAuthProvider();
-        if (window.innerWidth > 768) {
-            firebase.auth().signInWithPopup(provider).catch(err => alert("Ralat Login: " + err.message));
-        } else {
-            firebase.auth().signInWithRedirect(provider);
+    async function loginGoogle() {
+    const provider = new firebase.auth.GoogleAuthProvider();
+    
+    // Tunjukkan loader semasa proses bermula
+    document.getElementById('loader').style.display = 'flex';
+    
+    try {
+        // Gunakan Popup secara default kerana lebih stabil di Chrome/Safari moden
+        await firebase.auth().signInWithPopup(provider);
+    } catch (error) {
+        console.log("Popup blocked or failed, trying redirect...", error);
+        // Jika popup gagal (biasanya kena block), baru guna redirect
+        try {
+            await firebase.auth().signInWithRedirect(provider);
+        } catch (err) {
+            alert("Ralat Akses: " + err.message);
         }
+    } finally {
+        document.getElementById('loader').style.display = 'none';
     }
+}
 
-    firebase.auth().onAuthStateChanged(async (user) => {
-        const landing = document.getElementById('landing-screen');
-        const app = document.getElementById('app-content');
-        if (user) {
+// Pantau status login dengan lebih pantas
+firebase.auth().onAuthStateChanged(async (user) => {
+    const landing = document.getElementById('landing-screen');
+    const app = document.getElementById('app-content');
+    
+    if (user) {
+        console.log("User detected:", user.email);
+        
+        // Pastikan UI bertukar walaupun loadProfile lambat
+        landing.classList.add('hidden'); 
+        landing.style.display = 'none';
+        app.classList.remove('hidden');
+        app.style.opacity = "1";
+
+        try {
             await loadProfile(user);
-            landing.style.display = 'none';
-            app.classList.remove('hidden');
-            app.style.opacity = "1";
-            resetForm();
-            updateClock();
-        } else {
-            landing.style.display = 'flex';
-            app.classList.add('hidden');
+        } catch (e) {
+            console.error("Profile load failed", e);
         }
-    });
+        
+        updateClock();
+    } else {
+        // Jika belum login, pastikan landing screen muncul
+        landing.style.display = 'flex';
+        landing.classList.remove('hidden');
+        app.classList.add('hidden');
+    }
+});
+
+// Tambah ini untuk handle redirect selepas login di mobile
+firebase.auth().getRedirectResult().then((result) => {
+    if (result.user) {
+        console.log("Redirect login success");
+    }
+}).catch((error) => {
+    if(error.code !== 'auth/no-auth-event') {
+        console.error("Redirect error:", error);
+    }
+});
 
     async function loadProfile(user) {
     try {
